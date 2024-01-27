@@ -195,19 +195,23 @@ body {
 }
 
 .review {
-    font-size: 1.5em;
+    font-size: 1.4em;
     letter-spacing: 2px;
     color: black;
     font-family: 'EB Garamond';
     padding-left: 95px;
     padding-right: 95px;
+}
 
+.review .line1, .review .line2, .review .line3 {
+    margin-bottom: 0.5em; 
 }
 
 .people-name {
     padding-top: 20px;
     font-size: 10px;
     color: #af9453;
+    font-weight: 500;
 }
 
 .gallery {
