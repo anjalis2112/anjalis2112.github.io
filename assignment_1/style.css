@@ -1,0 +1,340 @@
+@font-face {
+    font-family: "EB Garamond";
+    src: url(EB_Garamond/EBGaramond-VariableFont_wght.ttf);
+}
+body.html2 {
+    font-size:x-large;
+    font-weight: bold;
+    font-family: 'Times New Roman', Times, serif
+}
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding-top: 20px;
+}
+
+.navbar {
+    overflow: hidden;
+    position: fixed;
+    width: 715px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    top: 0;
+    z-index: 10;
+    padding-top: 20px;
+    padding-bottom: 20px;
+
+    background-color: white;
+
+}
+
+.navbar .left-val {
+    margin-left: 50px;
+    color: #af9453;
+    font-size: 11px;
+}
+
+.navbar .nav-links {
+    display: flex;
+    margin-right: 50px;
+}
+
+.navbar .nav-links a[href="html2.html#home"] {
+    display: block;
+    color: #af9453;
+    text-align: center;
+    font-size: 11px;
+    padding: 14px 20px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.navbar .nav-links a {
+    display: block;
+    color: #484848;
+    text-align: center;
+    font-size: 11px;
+    padding: 14px 20px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.navbar .nav-links a:hover {
+    color: #af9453;
+}
+
+.first-fixed-background {
+    position: relative; /* Essential for anchoring the child absolute positioning */
+    width: 715px;
+    height: 590px;
+    background-image: url('images/image3.png');
+    background-size: 715px 710px;
+    background-repeat: no-repeat;
+    background-position: left top;
+    background-attachment: fixed;
+}
+
+.centered-text {
+    position: absolute; 
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); 
+    color: white;
+    font-size: 2em;
+    letter-spacing: 12px;
+    font-family: 'EB Garamond';
+    text-align: center;
+    white-space: nowrap; 
+}
+
+.centered-text div {
+    line-height: 1.5; /* Adjust line height as needed */
+}
+
+.services {
+    display: flex;
+    padding: 40px;
+    width: 635px;
+
+}
+
+.left-service,
+.right-service {
+    flex: 1;
+    max-width: 270px;
+    position: relative;
+}
+
+.service-centered-text {
+    position: absolute;
+    top: 25%;
+    left: 44%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2em;
+    letter-spacing: 8px;
+    color: #ffffff;
+    z-index: 2;
+
+}
+
+.service-text-two {
+    position: absolute;
+    top: 55%;
+    left: 41%;
+    transform: translate(-50%, -50%);
+    font-size: 0.9em;
+    letter-spacing: 1px;
+    color: #ffffff;
+    z-index: 2;
+    font-family: 'EB Garamond';
+    text-align: center;
+
+}
+
+.discover-text {
+    position: absolute;
+    bottom: 15%;
+    left: 41%;
+    transform: translate(-50%, -50%);
+    font-size: 0.6em;
+    color: #ffffff;
+    z-index: 2;
+    text-align: center;
+    border: solid white 1px;
+    width: 150px;
+    height: 30px;
+}
+
+.left-service img {
+    width: auto;
+    height: 320px;
+}
+
+.right-service img {
+    margin-right: 50px;
+    width: auto;
+    height: 320px;
+    display: block;
+}
+
+.testimonials {
+    text-align: center;
+    position: relative;
+    padding-top: 25px;
+    width: 715px;
+}
+
+.quote {
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+    width: 100%;
+    transform: scale(0.028);
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.part-two {
+    display: flex;
+}
+
+.left-arrow {
+    padding-top: 30px;
+    padding-left: 50px;
+    font-size: 30px;
+    color: #af9453;
+
+}
+
+.right-arrow {
+    padding-top: 30px;
+    padding-right: 50px;
+    font-size: 30px;
+    color: #af9453;
+}
+
+.review {
+    font-size: 1.5em;
+    letter-spacing: 2px;
+    color: black;
+    font-family: 'EB Garamond';
+    padding-left: 95px;
+    padding-right: 95px;
+
+}
+
+.people-name {
+    padding-top: 20px;
+    font-size: 10px;
+    color: #af9453;
+}
+
+.gallery {
+    padding: 40px;
+    padding-top: 60px;
+    width: 635px;
+}
+
+.fixed-background {
+    width: 635px;
+    height: 400px;
+    background-image: url('images/image2.png');
+    background-size: cover;
+    background-size: 715px 780px; 
+    background-position: 10px 10px;
+    background-repeat: no-repeat; 
+    background-attachment: fixed;
+    position: relative;
+    /* Set the container to relative position */
+}
+
+.gallery-details {
+    flex: 1;
+    max-width: 270px;
+    position: relative;
+    float: right;
+}
+
+.gallery-service {
+    position: absolute;
+    width: 180px;
+    height: 300px;
+    right: 0;
+    margin-top: 50px;
+    margin-right: 40px;
+    z-index: 1;
+
+}
+
+.gallery-centered-text {
+    top: 110px;
+    left: 8%;
+    transform: translate(-50%, -50%);
+    position: relative;
+    font-size: 1.2em;
+    letter-spacing: 7px;
+    color: white;
+    z-index: 2;
+
+
+}
+
+.gallery-text-two {
+    top: 190px;
+    left: 8%;
+    transform: translate(-50%, -50%);
+    position: relative;
+    font-weight: 400;
+    line-height: 25px;
+    font-size: 0.8em;
+    letter-spacing: 3px;
+    color: white;
+    z-index: 2;
+    font-family: 'EB Garamond';
+    text-align: center;
+
+}
+
+.gallery-discover-text {
+    position: absolute;
+    top: 280px;
+    left: 6%;
+    transform: translate(-50%, -50%);
+    font-size: 0.6em;
+    color: white;
+    z-index: 2;
+    text-align: center;
+    border: solid white 1px;
+    width: 110px;
+    height: 30px;
+}
+
+.contact {
+    width: 635px;
+    padding: 40px;
+    background-color: #af9453;
+    background-clip: content-box;
+    display: flex;
+    height: 120px;
+    align-items: center;
+    justify-content: space-between;
+
+}
+
+.contact ul {
+    list-style: none;
+}
+
+.contact ul li {
+    display: inline-block;
+    padding: 0 15px;
+    position: relative;
+}
+
+.contact li:not(:last-child)::after {
+    content: "";
+    border: 1px solid #e2e2e2;
+    border-width: 1px 1px 0 0;
+    position: absolute;
+    right: -3px;
+    top: 0;
+    height: 100%;
+}
+
+.contact-info {
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    color: #ffffff;
+}
+
+.consultation-text {
+    font-size: 0.56em;
+    color: white;
+    z-index: 2;
+    text-align: center;
+    border: solid white 0.7px;
+    width: 130px;
+    height: 30px;
+    margin-right: 40px;
+}
