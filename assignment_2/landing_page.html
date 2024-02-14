@@ -1,24 +1,416 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assignment 2</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
 </head>
+
 <body>
     <div class="search-bar-div">
         <div class="heading">Stock Search</div>
         <div class="search-bar">
-            <button class="search-button" type="submit">
-                <img src="img/search-solid.svg" alt="search"/>
+            <button class="search-button" type="submit" onclick="searchStock()">
+                <img src="img/search-solid.svg" alt="search" />
             </button>
-            <input type="text" class="search-input" placeholder="Enter Stock Ticker Symbol">
-            <div class="separator"></div> 
+            <input type="text" id="symbolInput" class="search-input" placeholder="Enter Stock Ticker Symbol">
+            <div class="separator"></div>
             <button class="cancel-button" type="cancel">
-                <img src="img/times-solid.svg" alt="cancel"/>
+                <img src="img/times-solid.svg" alt="cancel" />
             </button>
         </div>
     </div>
+
+    <!-- Placeholder for displaying error message -->
+    <div id="error-message-container">
+        <div id="error-message">Error: No record has been found, please enter a valid symbol</div>
+    </div>
+
+    <div class="navigation-buttons">
+        <button class="nav-button" id="company-button" onclick="showTab('company')">Company</button>
+        <button class="nav-button" id="summary-button" onclick="showTab('summary')">Stock Summary</button>
+        <button class="nav-button" id="charts-button" onclick="showTab('charts')">Charts</button>
+        <button class="nav-button" id="news-button" onclick="showTab('news')">Latest News</button>
+    </div>
+
+    <!-- Placeholder for displaying company information and other sections -->
+    <div id="section-container">
+    </div>
+    </div>
+
+    <script>
+        let companyData = null;
+        let summaryData = null;
+        let chartData = {
+            categories: [],
+            stockPrices: [],
+            volumes: []
+        };
+        let recTrendData = null;
+        let newsData = null;
+
+        function searchStock() {
+            var symbol = document.getElementById("symbolInput").value;
+            if (symbol.trim() !== "") {
+                fetchStockProfile(symbol);
+                fetchStockSummary(symbol);
+                fetchRecommendationTrends(symbol);
+                fetchCompanyNews(symbol);
+                fetchChartData(symbol);
+            } else {
+                alert("Please enter a stock symbol");
+            }
+        }
+
+        function fetchChartData(symbol) {
+            fetch(`http://127.0.0.1:5000/stock/chart-data?symbol=${symbol}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.results.forEach(result => {
+                        const date = new Date(result.t);
+                        const formattedDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+                        chartData.categories.push(formattedDate);
+                        chartData.stockPrices.push(result.c);
+                        chartData.volumes.push(result.v);
+                    });
+                });
+        }
+
+        function createChart(chartData) {
+            clearSectionContainer();
+
+            const sectionContainer = document.getElementById("section-container");
+            const chartContainer = document.createElement('div');
+            chartContainer.id = 'highchart-container';
+            sectionContainer.appendChild(chartContainer);
+
+            Highcharts.stockChart('highchart-container', {
+                rangeSelector: {
+                    allButtonsEnabled: true,
+                    buttons: [{
+                        type: 'day',
+                        count: 7,
+                        text: '7d'
+                    }, {
+                        type: 'day',
+                        count: 15,
+                        text: '15d'
+                    }, {
+                        type: 'month',
+                        count: 1,
+                        text: '1m'
+                    },
+                    {
+                        type: 'month',
+                        count: 3,
+                        text: '3m'
+                    },
+                    {
+                        type: 'month',
+                        count: 6,
+                        text: '6m'
+                    }
+                    ],
+                    selected: 0
+                },
+                title: {
+                    text: 'Stock Price and Volume'
+                },
+                navigator: {
+                    series: {
+                        accessibility: {
+                            exposeAsGroupOnly: true
+                        }
+                    }
+                },
+                series: [{
+                    name: 'Stock Price',
+                    data: chartData.stockPrices.map((price, index) => [new Date(chartData.categories[index]).getTime(), price]),
+                    type: 'area',
+                    threshold: null,
+                    tooltip: {
+                        valueDecimals: 2
+                    },
+                    fillColor: {
+                        linearGradient: {
+                            x1: 0,
+                            y1: 0,
+                            x2: 0,
+                            y2: 1
+                        },
+                        stops: [
+                            [0, Highcharts.getOptions().colors[0]],
+                            [1, Highcharts.color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                        ]
+                    }
+                }, {
+                    name: 'Volume',
+                    data: chartData.volumes.map((volume, index) => [new Date(chartData.categories[index]).getTime(), volume]),
+                    yAxis: 1,
+                    type: 'column',
+                    tooltip: {
+                        valueDecimals: 0
+                    }
+                }],
+                yAxis: [{
+                    // Primary yAxis
+                    labels: {
+                        format: '{value}',
+                        style: {
+                            color: Highcharts.getOptions().colors[1]
+                        }
+                    },
+                    title: {
+                        text: 'Stock Price',
+                        style: {
+                            color: Highcharts.getOptions().colors[1]
+                        }
+                    }
+                }, {
+                    // Secondary yAxis
+
+                    title: {
+                        text: 'Volume',
+                        style: {
+                            color: Highcharts.getOptions().colors[0]
+                        }
+                    },
+                    labels: {
+                        formatter: function () {
+                            return this.value / 1000000 + 'M';
+                        },
+                        format: '{value}',
+                        style: {
+                            color: Highcharts.getOptions().colors[0]
+                        }
+                    }
+                }
+
+                ],
+                xAxis: {
+                    categories: chartData.categories.map(date => new Date(date).toLocaleDateString())
+                }
+            });
+        }
+
+
+
+        function showTab(tabName) {
+            clearErrorMessage();
+            clearButtonState();
+            const button = document.getElementById(`${tabName}-button`);
+            button.classList.add("active");
+
+            switch (tabName) {
+                case 'company':
+                    if (companyData) {
+                        showCompany(companyData);
+                    }
+                    break;
+                case 'summary':
+                    if (summaryData) {
+                        showStockSummary(summaryData, companyData.ticker);
+                    }
+                    break;
+                case 'charts':
+                    if (chartData) {
+                        createChart(chartData); // Start with 7 days range
+                    }
+                    break;
+                case 'news':
+                    break;
+            }
+        }
+
+
+
+        function fetchStockProfile(symbol) {
+            fetch(`http://127.0.0.1:5000/stock/profile?symbol=${symbol}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (Object.keys(data).length === 0 && data.constructor === Object) {
+                        displayErrorMessage();
+                    } else {
+                        companyData = data;
+                        showTab('company');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function showCompany(data) {
+            clearSectionContainer();
+
+            const sectionContainer = document.getElementById("section-container");
+            const logoImg = document.createElement("img");
+            logoImg.src = data.logo;
+            logoImg.alt = "Company Logo";
+            const companyName = document.createElement("div");
+            companyName.innerHTML = `<b>Company Name:</b> ${data.name}`;
+            const tickerSymbol = document.createElement("div");
+            tickerSymbol.innerHTML = `<b>Stock Ticker Symbol:</b> ${data.ticker}`;
+            const exchangeCode = document.createElement("div");
+            exchangeCode.innerHTML = `<b>Stock Exchange Code:</b> ${data.exchange}`;
+            const category = document.createElement("div");
+            category.innerHTML = `<b>Category:</b> ${data.finnhubIndustry}`;
+
+            sectionContainer.appendChild(logoImg);
+            sectionContainer.appendChild(companyName);
+            sectionContainer.appendChild(tickerSymbol);
+            sectionContainer.appendChild(exchangeCode);
+            sectionContainer.appendChild(category);
+        }
+
+        function fetchStockSummary(symbol) {
+            fetch(`http://127.0.0.1:5000/stock/summary?symbol=${symbol}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (Object.keys(data).length === 0 && data.constructor === Object) {
+                        displayErrorMessage();
+                    } else {
+                        summaryData = data;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function showStockSummary(data, ticker_val) {
+            clearSectionContainer();
+
+            const sectionContainer = document.getElementById("section-container");
+            const stockSummaryDiv = document.createElement("div");
+            stockSummaryDiv.classList.add("stock-summary");
+
+            const date = new Date(data.t * 1000);
+
+            const changePercent = data.dp;
+            const changeArrow = changePercent > 0 ? "img/GreenArrowUp.png" : "img/RedArrowDown.png";
+            const changeArrowImg = `<img src="${changeArrow}" alt="Change Arrow">`;
+
+            const change = data.d;
+            const changeArrowSymbol = change > 0 ? "+" : "";
+
+            const stockSummaryDetails = `
+                <div><b>Stock Ticker Symbol:</b> ${ticker_val}</div>
+                <div><b>Trading Day:</b> ${date.toDateString()}</div>
+                <div><b>Previous Closing Price:</b> ${data.pc}</div>
+                <div><b>Opening Price:</b> ${data.o}</div>
+                <div><b>High Price:</b> ${data.h}</div>
+                <div><b>Low Price:</b> ${data.l}</div>
+                <div><b>Change:</b> ${changeArrowSymbol}${change} ${changeArrowImg}</div>
+                <div><b>Change Percent:</b> ${changePercent}% ${changeArrowImg}</div>
+            `;
+
+            stockSummaryDiv.innerHTML = stockSummaryDetails;
+            sectionContainer.appendChild(stockSummaryDiv);
+
+            if (recTrendData) {
+                showRecommendationTrends(recTrendData);
+            }
+        }
+
+        function fetchRecommendationTrends(symbol) {
+            fetch(`http://127.0.0.1:5000/stock/recommendation-trends?symbol=${symbol}`)
+                .then(response => response.json())
+                .then(data => {
+                    recTrendData = data
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function showRecommendationTrends(data) {
+            const recommendationTrendsContainer = document.createElement("div");
+            recommendationTrendsContainer.classList.add("recommendation-trends");
+
+            const latestTrends = data[data.length - 1];
+
+            const strongSell = document.createElement("div");
+            strongSell.innerHTML = "Strong Sell";
+            strongSell.style.color = "#f07a66";
+            recommendationTrendsContainer.appendChild(strongSell);
+
+            const strongSellBox = createRecommendationBox("strongSell", latestTrends.strongSell);
+            recommendationTrendsContainer.appendChild(strongSellBox);
+
+            const sellBox = createRecommendationBox("sell", latestTrends.sell);
+            recommendationTrendsContainer.appendChild(sellBox);
+
+            const holdBox = createRecommendationBox("hold", latestTrends.hold);
+            recommendationTrendsContainer.appendChild(holdBox);
+
+            const buyBox = createRecommendationBox("buy", latestTrends.buy);
+            recommendationTrendsContainer.appendChild(buyBox);
+
+            const strongBuyBox = createRecommendationBox("strongBuy", latestTrends.strongBuy);
+            recommendationTrendsContainer.appendChild(strongBuyBox);
+
+            const strongBuy = document.createElement("div");
+            strongBuy.innerHTML = "Strong Buy";
+            strongBuy.style.color = "#80d193";
+            recommendationTrendsContainer.appendChild(strongBuy);
+
+            const recomTrendText = document.createElement("div");
+            recomTrendText.innerHTML = "Recommendation Trends";
+            recommendationTrendsContainer.appendChild(recomTrendText);
+
+            document.getElementById("section-container").appendChild(recommendationTrendsContainer);
+        }
+
+        function createRecommendationBox(type, value) {
+            const box = document.createElement("div");
+            box.classList.add("recommendation-box");
+            box.style.backgroundColor = getBoxColor(type);
+            box.innerHTML = value;
+            return box;
+        }
+
+        function getBoxColor(type) {
+            switch (type) {
+                case "strongSell":
+                    return "#ed2937";
+                case "sell":
+                    return "#b25f4a";
+                case "hold":
+                    return "#77945c";
+                case "buy":
+                    return "#3cca6c";
+                case "strongBuy":
+                    return "#02ff7f";
+                default:
+                    return "#fff";
+            }
+        }
+
+        function fetchCompanyNews(symbol) {
+            fetch(`http://127.0.0.1:5000/stock/company-news?symbol=${symbol}`)
+                .then(response => response.json())
+                .then(data => {
+                    newsData = data;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function displayErrorMessage() {
+            document.getElementById("error-message").style.display = "block";
+        }
+
+        function clearButtonState() {
+            const buttons = document.querySelectorAll(".nav-button");
+            buttons.forEach(button => button.classList.remove("active"));
+        }
+
+        function clearErrorMessage() {
+            document.getElementById("error-message").style.display = "none";
+        }
+
+        function clearSectionContainer() {
+            document.getElementById("section-container").innerHTML = '';
+        }
+
+    </script>
 </body>
+
 </html>

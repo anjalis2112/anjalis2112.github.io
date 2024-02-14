@@ -342,3 +342,31 @@ body {
     height: 30px;
     margin-right: 40px;
 }
+
+#company-info-container,
+#other-sections-container {
+    display: none;
+}
+
+.navigation-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.nav-button {
+    background-color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin: 0 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.nav-button:hover {
+    background-color: #f0f0f0;
+}
+
+.nav-button.active {
+    background-color: #ccc;
+}
