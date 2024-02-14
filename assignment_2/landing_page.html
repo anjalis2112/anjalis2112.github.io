@@ -24,7 +24,6 @@
         </div>
     </div>
 
-    <!-- Placeholder for displaying error message -->
     <div id="error-message-container">
         <div id="error-message">Error: No record has been found, please enter a valid symbol</div>
     </div>
@@ -36,12 +35,12 @@
         <button class="nav-button" id="news-button" onclick="showTab('news')">Latest News</button>
     </div>
 
-    <!-- Placeholder for displaying company information and other sections -->
     <div id="section-container">
     </div>
     </div>
 
     <script>
+        let companyName = null;
         let companyData = null;
         let summaryData = null;
         let chartData = {
@@ -66,6 +65,11 @@
         }
 
         function fetchChartData(symbol) {
+
+            chartData.categories = [];
+            chartData.stockPrices = [];
+            chartData.volumes = [];
+
             fetch(`http://127.0.0.1:5000/stock/chart-data?symbol=${symbol}`)
                 .then(response => response.json())
                 .then(data => {
@@ -79,45 +83,52 @@
                 });
         }
 
-        function createChart(chartData) {
+        function createChart(chartData, symbol) {
             clearSectionContainer();
 
             const sectionContainer = document.getElementById("section-container");
             const chartContainer = document.createElement('div');
             chartContainer.id = 'highchart-container';
             sectionContainer.appendChild(chartContainer);
+            const today = new Date().toISOString().split('T')[0];
 
             Highcharts.stockChart('highchart-container', {
                 rangeSelector: {
                     allButtonsEnabled: true,
-                    buttons: [{
-                        type: 'day',
-                        count: 7,
-                        text: '7d'
-                    }, {
-                        type: 'day',
-                        count: 15,
-                        text: '15d'
-                    }, {
-                        type: 'month',
-                        count: 1,
-                        text: '1m'
-                    },
-                    {
-                        type: 'month',
-                        count: 3,
-                        text: '3m'
-                    },
-                    {
-                        type: 'month',
-                        count: 6,
-                        text: '6m'
-                    }
+                    buttons: [
+                        {
+                            type: 'day',
+                            count: 7,
+                            text: '7d'
+                        },
+                        {
+                            type: 'day',
+                            count: 15,
+                            text: '15d'
+                        },
+                        {
+                            type: 'month',
+                            count: 1,
+                            text: '1m'
+                        },
+                        {
+                            type: 'month',
+                            count: 3,
+                            text: '3m'
+                        },
+                        {
+                            type: 'month',
+                            count: 6,
+                            text: '6m'
+                        }
                     ],
                     selected: 0
                 },
                 title: {
-                    text: 'Stock Price and Volume'
+                    text: `Stock Price ${symbol} ${today}`,
+                    style: {
+                        color: '#000000'
+                    }
                 },
                 navigator: {
                     series: {
@@ -126,74 +137,93 @@
                         }
                     }
                 },
-                series: [{
-                    name: 'Stock Price',
-                    data: chartData.stockPrices.map((price, index) => [new Date(chartData.categories[index]).getTime(), price]),
-                    type: 'area',
-                    threshold: null,
-                    tooltip: {
-                        valueDecimals: 2
-                    },
-                    fillColor: {
-                        linearGradient: {
-                            x1: 0,
-                            y1: 0,
-                            x2: 0,
-                            y2: 1
+                series: [
+                    {
+                        name: 'Stock Price',
+                        data: chartData.stockPrices.map((price, index) => [new Date(chartData.categories[index]).getTime(), price]),
+                        type: 'area',
+                        threshold: null,
+                        tooltip: {
+                            valueDecimals: 2
                         },
-                        stops: [
-                            [0, Highcharts.getOptions().colors[0]],
-                            [1, Highcharts.color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-                        ]
-                    }
-                }, {
-                    name: 'Volume',
-                    data: chartData.volumes.map((volume, index) => [new Date(chartData.categories[index]).getTime(), volume]),
-                    yAxis: 1,
-                    type: 'column',
-                    tooltip: {
-                        valueDecimals: 0
-                    }
-                }],
-                yAxis: [{
-                    // Primary yAxis
-                    labels: {
-                        format: '{value}',
-                        style: {
-                            color: Highcharts.getOptions().colors[1]
+                        fillColor: {
+                            linearGradient: {
+                                x1: 0,
+                                y1: 0,
+                                x2: 0,
+                                y2: 1
+                            },
+                            stops: [
+                                [0, Highcharts.getOptions().colors[0]],
+                                [1, Highcharts.color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                            ]
                         }
                     },
-                    title: {
-                        text: 'Stock Price',
-                        style: {
-                            color: Highcharts.getOptions().colors[1]
-                        }
-                    }
-                }, {
-                    // Secondary yAxis
-
-                    title: {
-                        text: 'Volume',
-                        style: {
-                            color: Highcharts.getOptions().colors[0]
-                        }
-                    },
-                    labels: {
-                        formatter: function () {
-                            return this.value / 1000000 + 'M';
+                    {
+                        name: 'Volume',
+                        data: chartData.volumes.map((volume, index) => [new Date(chartData.categories[index]).getTime(), volume]),
+                        yAxis: 1,
+                        type: 'column',
+                        color: '#000000',
+                        pointWidth: 4,
+                        tooltip: {
+                            valueDecimals: 0
                         },
-                        format: '{value}',
-                        style: {
-                            color: Highcharts.getOptions().colors[0]
+                        states: {
+                            hover: {
+                                color: Highcharts.color('#000000').brighten(0.1).get()
+                            }
                         }
                     }
-                }
-
+                ],
+                yAxis: [
+                    {
+                        labels: {
+                            format: '{value}',
+                            style: {
+                                color: '#000000'
+                            }
+                        },
+                        title: {
+                            text: 'Stock Price',
+                            style: {
+                                color: '#000000'
+                            }
+                        },
+                        opposite: false
+                    },
+                    {
+                        title: {
+                            text: 'Volume',
+                            style: {
+                                color: '#000000'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return this.value / 1000000 + 'M';
+                            },
+                            format: '{value}',
+                            style: {
+                                color: '#000000'
+                            }
+                        },
+                        opposite: true
+                    }
                 ],
                 xAxis: {
-                    categories: chartData.categories.map(date => new Date(date).toLocaleDateString())
+                    categories: chartData.categories.map(date => new Date(date).toLocaleDateString()),
+                    labels: {
+                        style: {
+                            color: '#000000'
+                        }
+                    }
                 }
             });
+            const sourceLink = document.createElement('a');
+            sourceLink.href = 'https://polygon.io/';
+            sourceLink.textContent = 'Source: polygon.io';
+            sectionContainer.appendChild(sourceLink);
         }
 
 
@@ -217,7 +247,7 @@
                     break;
                 case 'charts':
                     if (chartData) {
-                        createChart(chartData); // Start with 7 days range
+                        createChart(chartData, companyName);
                     }
                     break;
                 case 'news':
@@ -234,6 +264,7 @@
                     if (Object.keys(data).length === 0 && data.constructor === Object) {
                         displayErrorMessage();
                     } else {
+                        companyName = symbol;
                         companyData = data;
                         showTab('company');
                     }

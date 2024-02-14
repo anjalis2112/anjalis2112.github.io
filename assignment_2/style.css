@@ -14,20 +14,21 @@ body {
     background-color: #f8f9fa;
     background-image: url('img/back.svg');
     background-repeat: no-repeat;
-    background-size: 1440px 300px; /* or contain */
+    background-size: 1440px 300px;
+    /* or contain */
     background-attachment: fixed;
     display: flex;
     justify-content: center;
     align-items: center;
-    
+
 }
 
 .search-bar-div .heading {
     font-size: 30px;
     position: absolute;
     top: 30px;
-    left: 50%; 
-    transform: translateX(-50%); 
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .search-bar {
@@ -41,8 +42,8 @@ body {
     width: 420px;
     height: 25px;
     padding: 8px 12px;
-    border: none; 
-    outline: none; 
+    border: none;
+    outline: none;
 }
 
 .search-input::placeholder {
@@ -81,28 +82,29 @@ body {
 .search-button {
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
-    border-top-left-radius: 10px; 
-    border-bottom-left-radius: 10px; 
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
     background-color: white;
 }
 
 .separator {
     width: 1pt;
-    background-color: #ccc; 
+    background-color: #ccc;
     box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.2);
 }
 
 .cancel-button {
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
-    border-top-left-radius: 0px; 
-    border-bottom-left-radius: 0px; 
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
     background-color: white;
 }
 
 #error-message-container {
     display: flex;
-    justify-content: center; /* Center the container horizontally */
+    justify-content: center;
+    /* Center the container horizontally */
 }
 
 #error-message {
@@ -112,7 +114,8 @@ body {
     border-radius: 10px;
     margin-top: 50px;
     width: 600px;
-    text-align: center; /* Keep the text left-aligned */
+    text-align: center;
+    /* Keep the text left-aligned */
 }
 
 .navigation-buttons {
@@ -138,13 +141,8 @@ body {
 .nav-button.active {
     background-color: #d2d2d2;
 }
+
 .stock-summary img {
     width: 10px;
     height: 10px;
 }
-
-
-    
-
-
-
