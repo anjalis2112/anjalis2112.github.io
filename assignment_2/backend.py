@@ -82,7 +82,7 @@ def get_company_news():
 @app.route('/stock/chart-data', methods=['GET'])
 def get_chart_data():
     symbol = request.args.get('symbol')
-
+    symbol = symbol.upper()
     if symbol:
         multiplier = 1
         timespan = "day"

@@ -177,7 +177,9 @@ body {
 }
 
 .article-img {
-    max-width: 150px; /* Adjust the maximum width as needed */
-    max-height: 100px; /* Adjust the maximum height as needed */
+    max-width: 150px;
+    /* Adjust the maximum width as needed */
+    max-height: 100px;
+    /* Adjust the maximum height as needed */
     object-fit: cover;
 }

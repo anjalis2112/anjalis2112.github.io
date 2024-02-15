@@ -18,7 +18,7 @@
             </button>
             <input type="text" id="symbolInput" class="search-input" placeholder="Enter Stock Ticker Symbol">
             <div class="separator"></div>
-            <button class="cancel-button" type="cancel">
+            <button class="cancel-button" type="cancel" onclick="clearInput()">
                 <img src="img/times-solid.svg" alt="cancel" />
             </button>
         </div>
@@ -28,7 +28,7 @@
         <div id="error-message">Error: No record has been found, please enter a valid symbol</div>
     </div>
 
-    <div class="navigation-buttons">
+    <div class="navigation-buttons" style="display: none;">
         <button class="nav-button" id="company-button" onclick="showTab('company')">Company</button>
         <button class="nav-button" id="summary-button" onclick="showTab('summary')">Stock Summary</button>
         <button class="nav-button" id="charts-button" onclick="showTab('charts')">Charts</button>
@@ -36,7 +36,6 @@
     </div>
 
     <div id="section-container">
-    </div>
     </div>
 
     <script>
@@ -54,18 +53,79 @@
         function searchStock() {
             var symbol = document.getElementById("symbolInput").value;
             if (symbol.trim() !== "") {
+                clearErrorMessage();
                 fetchStockProfile(symbol);
                 fetchStockSummary(symbol);
                 fetchRecommendationTrends(symbol);
                 fetchCompanyNews(symbol);
                 fetchChartData(symbol);
             } else {
-                alert("Please enter a stock symbol");
+                displayErrorMessage();
+                clearSectionContainer();
+                hideNavigationButtons();
             }
         }
 
-        function fetchChartData(symbol) {
+        function hideNavigationButtons() {
+            const navigationButtons = document.querySelector(".navigation-buttons");
+            navigationButtons.style.display = "none";
+        }
 
+        function showNavigationButtons() {
+            const navigationButtons = document.querySelector(".navigation-buttons");
+            navigationButtons.style.display = "block";
+        }
+
+        function fetchStockProfile(symbol) {
+            fetch(`http://127.0.0.1:5000/stock/profile?symbol=${symbol}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (Object.keys(data).length === 0 && data.constructor === Object) {
+                        displayErrorMessage();
+                        hideNavigationButtons(); // Hide navigation buttons if no data
+                    } else {
+                        companyName = symbol;
+                        companyData = data;
+                        showNavigationButtons(); // Show navigation buttons if data is available
+                        showTab('company');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function fetchStockSummary(symbol) {
+            fetch(`http://127.0.0.1:5000/stock/summary?symbol=${symbol}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (Object.keys(data).length === 0 && data.constructor === Object) {
+                        displayErrorMessage();
+                        hideNavigationButtons();
+                    } else {
+                        summaryData = data;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function fetchRecommendationTrends(symbol) {
+            fetch(`http://127.0.0.1:5000/stock/recommendation-trends?symbol=${symbol}`)
+                .then(response => response.json())
+                .then(data => {
+                    recTrendData = data;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function fetchCompanyNews(symbol) {
+            fetch(`http://127.0.0.1:5000/stock/company-news?symbol=${symbol}`)
+                .then(response => response.json())
+                .then(data => {
+                    newsData = data;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function fetchChartData(symbol) {
             chartData.categories = [];
             chartData.stockPrices = [];
             chartData.volumes = [];
@@ -125,7 +185,7 @@
                     selected: 0
                 },
                 title: {
-                    text: `Stock Price ${symbol} ${today}`,
+                    text: `Stock Price ${symbol.toUpperCase()} ${today}`,
                     style: {
                         color: '#000000'
                     }
@@ -226,110 +286,89 @@
             sectionContainer.appendChild(sourceLink);
         }
 
-
-
         function showTab(tabName) {
-    clearErrorMessage();
-    clearButtonState();
-    const button = document.getElementById(`${tabName}-button`);
-    button.classList.add("active");
+            clearErrorMessage();
+            clearButtonState();
+            const button = document.getElementById(`${tabName}-button`);
+            button.classList.add("active");
 
-    switch (tabName) {
-        case 'company':
-            if (companyData) {
-                showCompany(companyData);
-            }
-            break;
-        case 'summary':
-            if (summaryData) {
-                showStockSummary(summaryData, companyData.ticker);
-            }
-            break;
-        case 'charts':
-            if (chartData) {
-                createChart(chartData, companyName);
-            }
-            break;
-        case 'news':
-            showNews();
-            break;
-    }
-}
-
-function showNews() {
-    clearSectionContainer();
-    if (newsData) {
-        let count = 0;
-        for (let i = 0; i < newsData.length; i++) {
-            const article = newsData[i];
-            if (
-                article.image &&
-                article.url &&
-                article.headline &&
-                article.datetime &&
-                article.datetime !== "" &&
-                article.datetime !== null &&
-                article.datetime !== undefined
-            ) {
-                const date = new Date(article.datetime * 1000);
-                const formattedDate = `${date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
-                
-                const articleContainer = document.createElement('div');
-                articleContainer.classList.add('article-container');
-
-                const image = document.createElement('img');
-image.src = article.image;
-image.alt = "Article Image";
-image.classList.add('article-img'); // Add this line
-articleContainer.appendChild(image);
-
-                const detailsContainer = document.createElement('div');
-                detailsContainer.classList.add('article-details');
-
-                const title = document.createElement('div');
-                title.classList.add('article-title');
-                title.textContent = article.headline;
-                detailsContainer.appendChild(title);
-
-                const articleDate = document.createElement('div');
-                articleDate.classList.add('article-date');
-                articleDate.textContent = formattedDate;
-                detailsContainer.appendChild(articleDate);
-
-                const originalPostLink = document.createElement('a');
-                originalPostLink.href = article.url;
-                originalPostLink.textContent = 'See original post';
-                originalPostLink.target = "_blank";
-                detailsContainer.appendChild(originalPostLink);
-
-                articleContainer.appendChild(detailsContainer);
-                document.getElementById('section-container').appendChild(articleContainer);
-
-                count++;
-                if (count >= 5) {
+            switch (tabName) {
+                case 'company':
+                    if (companyData) {
+                        showCompany(companyData);
+                    }
                     break;
-                }
+                case 'summary':
+                    if (summaryData) {
+                        showStockSummary(summaryData, companyData.ticker);
+                    }
+                    break;
+                case 'charts':
+                    if (chartData) {
+                        createChart(chartData, companyName);
+                    }
+                    break;
+                case 'news':
+                    showNews();
+                    break;
             }
         }
-    }
-}
 
+        function showNews() {
+            clearSectionContainer();
+            if (newsData) {
+                let count = 0;
+                for (let i = 0; i < newsData.length; i++) {
+                    const article = newsData[i];
+                    if (
+                        article.image &&
+                        article.url &&
+                        article.headline &&
+                        article.datetime &&
+                        article.datetime !== "" &&
+                        article.datetime !== null &&
+                        article.datetime !== undefined
+                    ) {
+                        const date = new Date(article.datetime * 1000);
+                        const formattedDate = `${date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+                        const articleContainer = document.createElement('div');
+                        articleContainer.classList.add('article-container');
 
+                        const image = document.createElement('img');
+                        image.src = article.image;
+                        image.alt = "Article Image";
+                        image.classList.add('article-img'); // Add this line
+                        articleContainer.appendChild(image);
 
+                        const detailsContainer = document.createElement('div');
+                        detailsContainer.classList.add('article-details');
 
-        function fetchStockProfile(symbol) {
-            fetch(`http://127.0.0.1:5000/stock/profile?symbol=${symbol}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (Object.keys(data).length === 0 && data.constructor === Object) {
-                        displayErrorMessage();
-                    } else {
-                        companyName = symbol;
-                        companyData = data;
-                        showTab('company');
+                        const title = document.createElement('div');
+                        title.classList.add('article-title');
+                        title.textContent = article.headline;
+                        detailsContainer.appendChild(title);
+
+                        const articleDate = document.createElement('div');
+                        articleDate.classList.add('article-date');
+                        articleDate.textContent = formattedDate;
+                        detailsContainer.appendChild(articleDate);
+
+                        const originalPostLink = document.createElement('a');
+                        originalPostLink.href = article.url;
+                        originalPostLink.textContent = 'See original post';
+                        originalPostLink.target = "_blank";
+                        detailsContainer.appendChild(originalPostLink);
+
+                        articleContainer.appendChild(detailsContainer);
+                        document.getElementById('section-container').appendChild(articleContainer);
+
+                        count++;
+                        if (count >= 5) {
+                            break;
+                        }
                     }
-                })
-                .catch(error => console.error('Error:', error));
+                }
+            }
         }
 
         function showCompany(data) {
@@ -353,19 +392,6 @@ articleContainer.appendChild(image);
             sectionContainer.appendChild(tickerSymbol);
             sectionContainer.appendChild(exchangeCode);
             sectionContainer.appendChild(category);
-        }
-
-        function fetchStockSummary(symbol) {
-            fetch(`http://127.0.0.1:5000/stock/summary?symbol=${symbol}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (Object.keys(data).length === 0 && data.constructor === Object) {
-                        displayErrorMessage();
-                    } else {
-                        summaryData = data;
-                    }
-                })
-                .catch(error => console.error('Error:', error));
         }
 
         function showStockSummary(data, ticker_val) {
@@ -401,15 +427,6 @@ articleContainer.appendChild(image);
             if (recTrendData) {
                 showRecommendationTrends(recTrendData);
             }
-        }
-
-        function fetchRecommendationTrends(symbol) {
-            fetch(`http://127.0.0.1:5000/stock/recommendation-trends?symbol=${symbol}`)
-                .then(response => response.json())
-                .then(data => {
-                    recTrendData = data
-                })
-                .catch(error => console.error('Error:', error));
         }
 
         function showRecommendationTrends(data) {
@@ -475,17 +492,9 @@ articleContainer.appendChild(image);
             }
         }
 
-        function fetchCompanyNews(symbol) {
-            fetch(`http://127.0.0.1:5000/stock/company-news?symbol=${symbol}`)
-                .then(response => response.json())
-                .then(data => {
-                    newsData = data;
-                })
-                .catch(error => console.error('Error:', error));
-        }
-
         function displayErrorMessage() {
-            document.getElementById("error-message").style.display = "block";
+            const errorMessage = document.getElementById("error-message");
+            errorMessage.style.display = "block";
         }
 
         function clearButtonState() {
@@ -499,6 +508,13 @@ articleContainer.appendChild(image);
 
         function clearSectionContainer() {
             document.getElementById("section-container").innerHTML = '';
+        }
+
+        function clearInput() {
+            document.getElementById("symbolInput").value = "";
+            clearErrorMessage();
+            clearSectionContainer();
+            hideNavigationButtons();
         }
 
     </script>
