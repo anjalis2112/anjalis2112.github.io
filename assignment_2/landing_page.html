@@ -24,6 +24,11 @@
         </div>
     </div>
 
+    <div id="alert-container">
+        <div id="alert-message">Please fill out this field</div>
+    </div>
+</div>
+
     <div id="error-message-container">
         <div id="error-message">Error: No record has been found, please enter a valid symbol</div>
     </div>
@@ -60,10 +65,11 @@
                 fetchCompanyNews(symbol);
                 fetchChartData(symbol);
             } else {
-                displayErrorMessage();
-                clearSectionContainer();
-                hideNavigationButtons();
+                document.getElementById("alert-container").style.display = "block";
             }
+        }
+        function hideAlert() {
+            document.getElementById("alert-container").style.display = "none";
         }
 
         function hideNavigationButtons() {
@@ -515,6 +521,7 @@
             clearErrorMessage();
             clearSectionContainer();
             hideNavigationButtons();
+            hideAlert()
         }
 
     </script>
