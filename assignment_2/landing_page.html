@@ -229,31 +229,91 @@
 
 
         function showTab(tabName) {
-            clearErrorMessage();
-            clearButtonState();
-            const button = document.getElementById(`${tabName}-button`);
-            button.classList.add("active");
+    clearErrorMessage();
+    clearButtonState();
+    const button = document.getElementById(`${tabName}-button`);
+    button.classList.add("active");
 
-            switch (tabName) {
-                case 'company':
-                    if (companyData) {
-                        showCompany(companyData);
-                    }
+    switch (tabName) {
+        case 'company':
+            if (companyData) {
+                showCompany(companyData);
+            }
+            break;
+        case 'summary':
+            if (summaryData) {
+                showStockSummary(summaryData, companyData.ticker);
+            }
+            break;
+        case 'charts':
+            if (chartData) {
+                createChart(chartData, companyName);
+            }
+            break;
+        case 'news':
+            showNews();
+            break;
+    }
+}
+
+function showNews() {
+    clearSectionContainer();
+    if (newsData) {
+        let count = 0;
+        for (let i = 0; i < newsData.length; i++) {
+            const article = newsData[i];
+            if (
+                article.image &&
+                article.url &&
+                article.headline &&
+                article.datetime &&
+                article.datetime !== "" &&
+                article.datetime !== null &&
+                article.datetime !== undefined
+            ) {
+                const date = new Date(article.datetime * 1000);
+                const formattedDate = `${date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+                
+                const articleContainer = document.createElement('div');
+                articleContainer.classList.add('article-container');
+
+                const image = document.createElement('img');
+image.src = article.image;
+image.alt = "Article Image";
+image.classList.add('article-img'); // Add this line
+articleContainer.appendChild(image);
+
+                const detailsContainer = document.createElement('div');
+                detailsContainer.classList.add('article-details');
+
+                const title = document.createElement('div');
+                title.classList.add('article-title');
+                title.textContent = article.headline;
+                detailsContainer.appendChild(title);
+
+                const articleDate = document.createElement('div');
+                articleDate.classList.add('article-date');
+                articleDate.textContent = formattedDate;
+                detailsContainer.appendChild(articleDate);
+
+                const originalPostLink = document.createElement('a');
+                originalPostLink.href = article.url;
+                originalPostLink.textContent = 'See original post';
+                originalPostLink.target = "_blank";
+                detailsContainer.appendChild(originalPostLink);
+
+                articleContainer.appendChild(detailsContainer);
+                document.getElementById('section-container').appendChild(articleContainer);
+
+                count++;
+                if (count >= 5) {
                     break;
-                case 'summary':
-                    if (summaryData) {
-                        showStockSummary(summaryData, companyData.ticker);
-                    }
-                    break;
-                case 'charts':
-                    if (chartData) {
-                        createChart(chartData, companyName);
-                    }
-                    break;
-                case 'news':
-                    break;
+                }
             }
         }
+    }
+}
+
 
 
 

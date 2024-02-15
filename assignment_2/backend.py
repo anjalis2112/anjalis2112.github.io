@@ -95,8 +95,6 @@ def get_chart_data():
         response = requests.get(url)
 
         if response.status_code == 200:
-            print(date_six_months_one_day_ago)
-            print(current_date)
             return response.json()
         else:
             return jsonify({'error': 'Failed to fetch data from Polygon API'})

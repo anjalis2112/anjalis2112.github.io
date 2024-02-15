@@ -146,3 +146,38 @@ body {
     width: 10px;
     height: 10px;
 }
+
+/* Add this CSS to your existing stylesheet or create a new one */
+
+.article-container {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.article-details {
+    margin-left: 10px;
+}
+
+.article-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.article-date {
+    margin-bottom: 5px;
+}
+
+.article-details a {
+    color: blue;
+    text-decoration: underline;
+}
+
+.article-details a:hover {
+    color: purple;
+}
+
+.article-img {
+    max-width: 150px; /* Adjust the maximum width as needed */
+    max-height: 100px; /* Adjust the maximum height as needed */
+    object-fit: cover;
+}
