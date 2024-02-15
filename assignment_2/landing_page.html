@@ -87,11 +87,11 @@
                 .then(data => {
                     if (Object.keys(data).length === 0 && data.constructor === Object) {
                         displayErrorMessage();
-                        hideNavigationButtons(); // Hide navigation buttons if no data
+                        hideNavigationButtons();
                     } else {
                         companyName = symbol;
                         companyData = data;
-                        showNavigationButtons(); // Show navigation buttons if data is available
+                        showNavigationButtons();
                         showTab('company');
                     }
                 })
@@ -158,7 +158,11 @@
             const today = new Date().toISOString().split('T')[0];
 
             Highcharts.stockChart('highchart-container', {
+                chart: {
+                    height: 600
+                },
                 rangeSelector: {
+                    inputEnabled: false,
                     allButtonsEnabled: true,
                     buttons: [
                         {
@@ -190,11 +194,12 @@
                     selected: 0
                 },
                 title: {
-                    text: `Stock Price ${symbol.toUpperCase()} ${today}`,
+                    text: `Stock Price ${symbol.toUpperCase()} ${today} <br><br> <a href="https://polygon.io/" style="color: blue; text-decoration: underline; font-weight: lighter" target="_blank">Source: polygon.io</a>`,
                     style: {
                         color: '#000000'
                     }
-                },
+                }
+                ,
                 navigator: {
                     series: {
                         accessibility: {
@@ -252,7 +257,7 @@
                         title: {
                             text: 'Stock Price',
                             style: {
-                                color: '#000000'
+                                color: '#808080'
                             }
                         },
                         opposite: false
@@ -261,7 +266,7 @@
                         title: {
                             text: 'Volume',
                             style: {
-                                color: '#000000'
+                                color: '#808080'
                             }
                         },
                         labels: {
@@ -285,10 +290,6 @@
                     }
                 }
             });
-            const sourceLink = document.createElement('a');
-            sourceLink.href = 'https://polygon.io/';
-            sourceLink.textContent = 'Source: polygon.io';
-            sectionContainer.appendChild(sourceLink);
         }
 
         function showTab(tabName) {
@@ -342,7 +343,7 @@
                         const image = document.createElement('img');
                         image.src = article.image;
                         image.alt = "Article Image";
-                        image.classList.add('article-img'); // Add this line
+                        image.classList.add('article-img');
                         articleContainer.appendChild(image);
 
                         const detailsContainer = document.createElement('div');
@@ -386,37 +387,40 @@
             logoImg.style.width = "100px";
             logoImg.style.marginTop = "30px";
             logoImg.style.marginBottom = "20px";
-            const companyDetails = document.createElement("div");
+            const companyDetailsTable = document.createElement("table");
+            companyDetailsTable.classList.add("company-details-table");
+            const companyDetailsRows = `
+                <thead>
+                <tr>
+                    <th colspan="2" style="border-top: 1px solid #ccc;"></th>
+                </tr>
+            </thead>
+                <tr>
+                    <td class="align-right"><b>Company Name</b></td>
+                    <td class="align-left">${data.name}</td>
+                </tr>
+                <tr>
+                    <td class="align-right"><b>Stock Ticker Symbol</b></td>
+                    <td class="align-left">${data.ticker}</td>
+                </tr>
+                <tr>
+                    <td class="align-right"><b>Stock Exchange Code</b></td>
+                    <td class="align-left">${data.exchange}</td>
+                </tr>
+                <tr>
+                    <td class="align-right"><b>Company Start Date</b></td>
+                    <td class="align-left">${data.ipo}</td>
+                </tr>
+                <tr>
+                    <td class="align-right"><b>Category</b></td>
+                    <td class="align-left">${data.finnhubIndustry}</td>
+                </tr>
+            `;
 
-            const companyInfo = `
-        <div><b>Company Name</b> ${data.name}</div>
-        <div><b>Stock Ticker Symbol</b> ${data.ticker}</div>
-        <div><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Stock Exchange Code</b> ${data.exchange}</div>
-        <div><b>Company Start Date</b> ${data.ipo}</div>
-        <div><b>Category</b> ${data.finnhubIndustry}</div>
-    `;
-
-            companyDetails.innerHTML = companyInfo;
-
-            // Add light grey lines between elements
-            companyDetails.querySelectorAll('div').forEach(element => {
-                element.style.borderBottom = "1px solid #ccc";
-                element.style.paddingBottom = "5px";
-                element.style.marginBottom = "5px";
-                element.style.textAlign = "center"; // Align text to the left
-            });
-
-            // Add line above company name
-            companyDetails.firstElementChild.style.borderTop = "1px solid #ccc";
-            companyDetails.firstElementChild.style.paddingTop = "5px";
-            companyDetails.firstElementChild.style.marginTop = "5px";
-            companyDetails.firstElementChild.style.textAlign = "center"; // Align text to the left
-
-            // Add margin between logo and company details
-            companyDetails.style.marginTop = "10px";
+            companyDetailsTable.innerHTML = companyDetailsRows;
 
             sectionContainer.appendChild(logoImg);
-            sectionContainer.appendChild(companyDetails);
+            sectionContainer.appendChild(companyDetailsTable);
         }
 
 
@@ -433,46 +437,50 @@
 
             const changePercent = data.dp;
             const changeArrow = changePercent > 0 ? "img/GreenArrowUp.png" : "img/RedArrowDown.png";
-            // Reduced the width and height of the arrow images
             const changeArrowImg = `<img src="${changeArrow}" alt="Change Arrow" style="width: 16px; height: 16px;">`;
 
             const change = data.d;
             const changeArrowSymbol = change > 0 ? "+" : "";
 
             const stockSummaryRows = `
-    <tr>
-        <td class="align-right"><b>Stock Ticker Symbol</b></td>
-        <td class="align-left">${ticker_val}</td>
-    </tr>
-    <tr>
-        <td class="align-right"><b>Trading Day</b></td>
-        <td class="align-left">${date.toDateString()}</td>
-    </tr>
-    <tr>
-        <td class="align-right"><b>Previous Closing Price</b></td>
-        <td class="align-left">${data.pc}</td>
-    </tr>
-    <tr>
-        <td class="align-right"><b>Opening Price</b></td>
-        <td class="align-left">${data.o}</td>
-    </tr>
-    <tr>
-        <td class="align-right"><b>High Price</b></td>
-        <td class="align-left">${data.h}</td>
-    </tr>
-    <tr>
-        <td class="align-right"><b>Low Price</b></td>
-        <td class="align-left">${data.l}</td>
-    </tr>
-    <tr>
-        <td class="align-right"><b>Change</b></td>
-        <td class="align-left">${changeArrowSymbol}${change} ${changeArrowImg}</td>
-    </tr>
-    <tr>
-        <td class="align-right"><b>Change Percent</b></td>
-        <td class="align-left">${changePercent}% ${changeArrowImg}</td>
-    </tr>
-`;
+                <thead>
+                <tr>
+                    <th colspan="2" style="border-top: 1px solid #ccc;"></th>
+                </tr>
+            </thead>
+                <tr>
+                    <td class="align-right"><b>Stock Ticker Symbol</b></td>
+                    <td class="align-left">${ticker_val}</td>
+                </tr>
+                <tr>
+                    <td class="align-right"><b>Trading Day</b></td>
+                    <td class="align-left">${date.toDateString()}</td>
+                </tr>
+                <tr>
+                    <td class="align-right"><b>Previous Closing Price</b></td>
+                    <td class="align-left">${data.pc}</td>
+                </tr>
+                <tr>
+                    <td class="align-right"><b>Opening Price</b></td>
+                    <td class="align-left">${data.o}</td>
+                </tr>
+                <tr>
+                    <td class="align-right"><b>High Price</b></td>
+                    <td class="align-left">${data.h}</td>
+                </tr>
+                <tr>
+                    <td class="align-right"><b>Low Price</b></td>
+                    <td class="align-left">${data.l}</td>
+                </tr>
+                <tr>
+                    <td class="align-right"><b>Change</b></td>
+                    <td class="align-left">${changeArrowSymbol}${change} ${changeArrowImg}</td>
+                </tr>
+                <tr>
+                    <td class="align-right"><b>Change Percent</b></td>
+                    <td class="align-left">${changePercent}% ${changeArrowImg}</td>
+                </tr>
+            `;
 
             stockSummaryTable.innerHTML = stockSummaryRows;
             sectionContainer.appendChild(stockSummaryTable);
@@ -488,7 +496,6 @@
 
             const latestTrends = data[data.length - 1];
 
-            // Create recommendation container
             const recommendationContainer = document.createElement("div");
             recommendationContainer.classList.add("recommendation-container");
 
@@ -505,7 +512,6 @@
             strongBuyText.classList.add("strongBuyText");
             strongBuyText.textContent = "Strong Buy";
             recommendationContainer.appendChild(strongBuyText);
-            // Append recommendation container
             recommendationTrendsContainer.appendChild(recommendationContainer);
 
             const trendsText = document.createElement("div");
@@ -513,7 +519,6 @@
             trendsText.textContent = "Recommendation Trends";
             recommendationTrendsContainer.appendChild(trendsText);
 
-            // Append to section container
             document.getElementById("section-container").appendChild(recommendationTrendsContainer);
         }
 
@@ -522,8 +527,11 @@
         function createRecommendationBox(type, value) {
             const box = document.createElement("div");
             box.classList.add("recommendation-box");
-            box.classList.add(type); // Add class for recommendation type
-            box.textContent = value; // Set the recommendation value as text content
+            box.classList.add(type);
+            box.textContent = value;
+            box.style.color = "white";
+            box.style.fontWeight = "bold";
+            box.style.fontSize = "20px";
             return box;
         }
 
