@@ -4,7 +4,7 @@
 }
 
 body {
-    font-family: 'Khula Light', sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 .search-bar-div {
@@ -15,7 +15,6 @@ body {
     background-image: url('img/back.svg');
     background-repeat: no-repeat;
     background-size: 1440px 300px;
-    /* or contain */
     background-attachment: fixed;
     display: flex;
     justify-content: center;
@@ -24,6 +23,7 @@ body {
 }
 
 .search-bar-div .heading {
+    font-family: "Khula Light";
     font-size: 30px;
     position: absolute;
     top: 30px;
@@ -101,27 +101,9 @@ body {
     background-color: white;
 }
 
-#alert-container {
-    display: none;
-    position: absolute;
-    top: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    border-radius: 4px;
-    padding: 10px;
-  }
-  
-  #alert-message {
-    color: #721c24;
-    font-weight: bold;
-  }
-
 #error-message-container {
     display: flex;
     justify-content: center;
-    /* Center the container horizontally */
 }
 
 #error-message {
@@ -132,23 +114,31 @@ body {
     margin-top: 50px;
     width: 600px;
     text-align: center;
-    /* Keep the text left-aligned */
 }
+
 
 .navigation-buttons {
+    background-color: #f0f0f0;
+    width: 1320px;
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    margin-left: 50px;
+    margin-right: 50px;
+    font-size: 0;
 }
 
-/* style.css */
 .nav-button {
     background-color: #f0f0f0;
     color: black;
     border: none;
-    padding: 10px 20px;
+    padding: 20px 35px;
     cursor: pointer;
     transition: background-color 0.3s;
+    font-size: 20px;
+    font-weight: lighter;
+    margin: 0;
 }
 
 .nav-button:hover {
@@ -159,12 +149,133 @@ body {
     background-color: #d2d2d2;
 }
 
+.container {
+    margin: 0 auto;
+    /* Center the container horizontally */
+    width: 1000px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#section-container {
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+#section-container>div {
+    width: 100%;
+    /* Ensure each div takes the full width */
+}
+
+
 .stock-summary img {
     width: 10px;
     height: 10px;
 }
 
-/* Add this CSS to your existing stylesheet or create a new one */
+.stock-summary-table {
+    margin: 0 auto; /* Center align the table */
+    border-collapse: collapse; /* Collapse border spacing */
+}
+
+.stock-summary-table td {
+    padding: 8px; /* Padding for table cells */
+}
+
+.align-right {
+    text-align: right; /* Align text in the first column to the right */
+}
+
+.align-left {
+    text-align: left; /* Align text in the second column to the left */
+}
+
+.stock-summary-table tr:not(:last-child) td {
+    border-bottom: 1px solid #ddd; /* Add border between rows */
+}
+
+/* CSS for recommendation trends */
+.recommendation-trends {
+    margin-top: 20px;
+}
+
+/* CSS for recommendation container */
+.recommendation-container {
+    display: flex;
+    align-items: center;
+}
+
+/* CSS for recommendation box */
+/* CSS for recommendation container */
+.recommendation-container {
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    flex-wrap: wrap; 
+}
+
+/* CSS for recommendation text */
+.recommendation-text {
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    margin-top: 10px;
+    width: 100%; 
+}
+
+.strongSellText{
+    width: 60px;
+    color: #ed2937;
+    margin-right: 20px;
+}
+
+.strongBuyText{
+    width: 60px;
+    color: #02ff7f;
+    margin-left: 20px;
+}
+
+/* CSS for recommendation box */
+.recommendation-box {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* CSS for recommendation box colors */
+/* You can adjust colors as needed */
+.recommendation-box.strongSell {
+    background-color: #ed2937;
+}
+
+.recommendation-box.sell {
+    background-color: #b25f4a;
+}
+
+.recommendation-box.hold {
+    background-color: #77945c;
+}
+
+.recommendation-box.buy {
+    background-color: #3cca6c;
+}
+
+.recommendation-box.strongBuy {
+    background-color: #02ff7f;
+}
+
+.trendsText{
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-family: "Khula Light";
+    font-size: 20px;
+}
 
 .article-container {
     display: flex;
@@ -195,8 +306,6 @@ body {
 
 .article-img {
     max-width: 150px;
-    /* Adjust the maximum width as needed */
     max-height: 100px;
-    /* Adjust the maximum height as needed */
     object-fit: cover;
 }
