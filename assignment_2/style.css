@@ -5,17 +5,17 @@
 
 body {
     font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
 }
 
 .search-bar-div {
     position: relative;
     width: 1440px;
-    height: 229px;
+    height: 237px;
     background-color: #f8f9fa;
     background-image: url('img/back.svg');
     background-repeat: no-repeat;
     background-size: 1440px 300px;
-    background-attachment: fixed;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -298,10 +298,12 @@ body {
     display: flex;
     align-items: flex-start;
     background-color: #f2f2f2;
-    padding: 10px;
 }
 
 .article-image-container {
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-bottom: 10px;
     margin-right: 20px;
 }
 
@@ -312,6 +314,7 @@ body {
 }
 
 .article-details {
+    margin-top: 10px;
     flex-grow: 1;
     text-align: left;
 }
