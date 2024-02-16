@@ -8,10 +8,14 @@ body {
     margin: 0;
 }
 
+.search-bar{
+    margin-bottom: 50px;
+}
+
 .search-bar-div {
     position: relative;
     width: 1440px;
-    height: 237px;
+    height: 300px;
     background-color: #f8f9fa;
     background-image: url('img/back.svg');
     background-repeat: no-repeat;
