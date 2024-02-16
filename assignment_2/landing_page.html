@@ -67,9 +67,6 @@
                 fetchChartData(symbol);
             }
         }
-        function hideAlert() {
-            document.querySelector(".alert-tooltip").style.display = "none";
-        }
 
         function hideNavigationButtons() {
             const navigationButtons = document.querySelector(".navigation-buttons");
@@ -88,6 +85,7 @@
                     if (Object.keys(data).length === 0 && data.constructor === Object) {
                         displayErrorMessage();
                         hideNavigationButtons();
+                        clearSectionContainer();
                     } else {
                         companyName = symbol;
                         companyData = data;
