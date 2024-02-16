@@ -155,11 +155,22 @@
             const chartContainer = document.createElement('div');
             chartContainer.id = 'highchart-container';
             sectionContainer.appendChild(chartContainer);
-            const today = new Date().toISOString().split('T')[0];
+            const today = new Date();
+            const todayString = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
 
+            if (chartData.categories.includes(todayString)) {
+                endDate = todayString;
+            } else {
+                endDate = chartData.categories[chartData.categories.length - 1];
+            }
+            const endDateTimestamp = new Date(endDate).getTime();
+            const categories = chartData.categories
+                .filter(date => date <= endDate)
+                .map(date => new Date(date).toLocaleDateString());
             Highcharts.stockChart('highchart-container', {
                 chart: {
-                    height: 600
+                    height: 600,
+                    spacingRight: 0
                 },
                 rangeSelector: {
                     inputEnabled: false,
@@ -194,7 +205,7 @@
                     selected: 0
                 },
                 title: {
-                    text: `Stock Price ${symbol.toUpperCase()} ${today} <br><br> <a href="https://polygon.io/" style="color: blue; text-decoration: underline; font-weight: lighter" target="_blank">Source: polygon.io</a>`,
+                    text: `Stock Price ${symbol.toUpperCase()} ${todayString} <br><br> <a href="https://polygon.io/" style="color: blue; text-decoration: underline; font-weight: lighter" target="_blank">Source: polygon.io</a>`,
                     style: {
                         color: '#000000'
                     }
@@ -209,6 +220,7 @@
                 },
                 series: [
                     {
+                        pointPlacement: 'on',
                         name: 'Stock Price',
                         data: chartData.stockPrices.map((price, index) => [new Date(chartData.categories[index]).getTime(), price]),
                         type: 'area',
@@ -230,6 +242,7 @@
                         }
                     },
                     {
+                        pointPlacement: 'on',
                         name: 'Volume',
                         data: chartData.volumes.map((volume, index) => [new Date(chartData.categories[index]).getTime(), volume]),
                         yAxis: 1,
@@ -247,6 +260,7 @@
                     }
                 ],
                 yAxis: [
+
                     {
                         labels: {
                             format: '{value}',
@@ -282,7 +296,7 @@
                     }
                 ],
                 xAxis: {
-                    categories: chartData.categories.map(date => new Date(date).toLocaleDateString()),
+                    categories: categories,
                     labels: {
                         style: {
                             color: '#000000'
