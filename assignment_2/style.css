@@ -8,7 +8,7 @@ body {
     margin: 0;
 }
 
-.search-bar{
+.search-bar {
     margin-bottom: 50px;
 }
 
@@ -312,8 +312,8 @@ body {
 }
 
 .article-img {
-    max-width: 150px;
-    max-height: 100px;
+    width: 100px;
+    height: 100px;
     object-fit: cover;
 }
 
@@ -342,6 +342,6 @@ body {
     text-decoration: underline;
 }
 
-.article-details a:hover {
-    color: purple;
+.article-details a:active {
+    color: red;
 }
