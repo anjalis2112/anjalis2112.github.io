@@ -13,7 +13,7 @@
     <div class="search-bar-div">
         <div class="heading">Stock Search</div>
         <form id="stock-search-form" onsubmit="event.preventDefault(); searchStock();">
-            <div class="search-bar">
+            <div class="search-bar">ƒ
                 <button class="search-button" type="submit">
                     <img src="img/search-solid.svg" alt="search" />
                 </button>
@@ -82,7 +82,7 @@
         }
 
         function fetchStockProfile(symbol) {
-            fetch(`http://127.0.0.1:5000/stock/profile?symbol=${symbol}`)
+            fetch(`https://csci-571-assgn-414502.wl.r.appspot.com/stock/profile?symbol=${symbol}`)
                 .then(response => response.json())
                 .then(data => {
                     if (Object.keys(data).length === 0 && data.constructor === Object) {
@@ -99,7 +99,7 @@
         }
 
         function fetchStockSummary(symbol) {
-            fetch(`http://127.0.0.1:5000/stock/summary?symbol=${symbol}`)
+            fetch(`https://csci-571-assgn-414502.wl.r.appspot.com/stock/summary?symbol=${symbol}`)
                 .then(response => response.json())
                 .then(data => {
                     if (Object.keys(data).length === 0 && data.constructor === Object) {
@@ -113,7 +113,7 @@
         }
 
         function fetchRecommendationTrends(symbol) {
-            fetch(`http://127.0.0.1:5000/stock/recommendation-trends?symbol=${symbol}`)
+            fetch(`https://csci-571-assgn-414502.wl.r.appspot.com/stock/recommendation-trends?symbol=${symbol}`)
                 .then(response => response.json())
                 .then(data => {
                     recTrendData = data;
@@ -122,7 +122,7 @@
         }
 
         function fetchCompanyNews(symbol) {
-            fetch(`http://127.0.0.1:5000/stock/company-news?symbol=${symbol}`)
+            fetch(`https://csci-571-assgn-414502.wl.r.appspot.com/stock/company-news?symbol=${symbol}`)
                 .then(response => response.json())
                 .then(data => {
                     newsData = data;
@@ -135,7 +135,7 @@
             chartData.stockPrices = [];
             chartData.volumes = [];
 
-            fetch(`http://127.0.0.1:5000/stock/chart-data?symbol=${symbol}`)
+            fetch(`https://csci-571-assgn-414502.wl.r.appspot.com/stock/chart-data?symbol=${symbol}`)
                 .then(response => response.json())
                 .then(data => {
                     data.results.forEach(result => {
