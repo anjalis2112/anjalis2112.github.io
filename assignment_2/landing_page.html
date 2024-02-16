@@ -38,7 +38,7 @@
         <button class="nav-button" id="news-button" onclick="showTab('news')">Latest News</button>
 
     </div>
-    <div class="container">
+    <div class="container" id="container">
         <div id="section-container">
         </div>
     </div>
@@ -152,6 +152,7 @@
             clearSectionContainer();
 
             const sectionContainer = document.getElementById("section-container");
+            sectionContainer.style.width = "1000px";
             const chartContainer = document.createElement('div');
             chartContainer.id = 'highchart-container';
             sectionContainer.appendChild(chartContainer);
@@ -170,6 +171,7 @@
             Highcharts.stockChart('highchart-container', {
                 chart: {
                     height: 600,
+                    width: 1000,
                     spacingRight: 0
                 },
                 rangeSelector: {
@@ -205,12 +207,19 @@
                     selected: 0
                 },
                 title: {
-                    text: `Stock Price ${symbol.toUpperCase()} ${todayString} <br><br> <a href="https://polygon.io/" style="color: blue; text-decoration: underline; font-weight: lighter" target="_blank">Source: polygon.io</a>`,
+                    text: `Stock Price ${symbol.toUpperCase()} ${todayString}`,
                     style: {
                         color: '#000000'
                     }
                 }
-                ,
+                , subtitle: {
+                    text: `<a href="https://polygon.io/" target="_blank">Source: polygon.io</a>`,
+                    style: {
+                        color: 'blue',
+                        fontWeight: 'lighter',
+                        textDecoration: 'underline'
+                    }
+                },
                 navigator: {
                     series: {
                         accessibility: {
@@ -351,14 +360,19 @@
                     ) {
                         const date = new Date(article.datetime * 1000);
                         const formattedDate = `${date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+
+
                         const articleContainer = document.createElement('div');
                         articleContainer.classList.add('article-container');
 
+
+                        const imageContainer = document.createElement('div');
+                        imageContainer.classList.add('article-image-container');
                         const image = document.createElement('img');
                         image.src = article.image;
                         image.alt = "Article Image";
                         image.classList.add('article-img');
-                        articleContainer.appendChild(image);
+                        imageContainer.appendChild(image);
 
                         const detailsContainer = document.createElement('div');
                         detailsContainer.classList.add('article-details');
@@ -366,20 +380,24 @@
                         const title = document.createElement('div');
                         title.classList.add('article-title');
                         title.textContent = article.headline;
-                        detailsContainer.appendChild(title);
 
                         const articleDate = document.createElement('div');
                         articleDate.classList.add('article-date');
                         articleDate.textContent = formattedDate;
-                        detailsContainer.appendChild(articleDate);
 
                         const originalPostLink = document.createElement('a');
                         originalPostLink.href = article.url;
                         originalPostLink.textContent = 'See original post';
                         originalPostLink.target = "_blank";
+
+                        detailsContainer.appendChild(title);
+                        detailsContainer.appendChild(articleDate);
                         detailsContainer.appendChild(originalPostLink);
 
+                        articleContainer.appendChild(imageContainer);
                         articleContainer.appendChild(detailsContainer);
+
+                        document.getElementById('container').style.width = "980px";
                         document.getElementById('section-container').appendChild(articleContainer);
 
                         count++;
@@ -390,6 +408,8 @@
                 }
             }
         }
+
+
 
         function showCompany(data) {
             clearSectionContainer();
