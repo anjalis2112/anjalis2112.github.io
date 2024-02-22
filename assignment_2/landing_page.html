@@ -202,7 +202,7 @@
                             text: '6m'
                         }
                     ],
-                    selected: 0
+                    selected: 4
                 },
                 title: {
                     text: `Stock Price ${symbol.toUpperCase()} ${todayString}`,
@@ -299,7 +299,8 @@
                                 color: '#000000'
                             }
                         },
-                        opposite: true
+                        opposite: true,
+                        max: Math.max(...chartData.volumes) * 2 
                     }
                 ],
                 xAxis: {

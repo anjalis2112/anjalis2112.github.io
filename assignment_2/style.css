@@ -76,11 +76,20 @@ body {
     filter: invert(92%) sepia(0%) saturate(403%) hue-rotate(244deg) brightness(91%) contrast(89%);
 }
 
+.search-button img:hover {
+    filter: invert(92%) sepia(0%) saturate(150%) hue-rotate(244deg) brightness(70%) contrast(70%);
+
+}
+
 .cancel-button img {
     width: 12px;
     height: auto;
     margin-right: 5px;
     filter: invert(92%) sepia(0%) saturate(403%) hue-rotate(244deg) brightness(91%) contrast(89%);
+}
+
+.cancel-button img:hover {
+    filter: invert(92%) sepia(0%) saturate(150%) hue-rotate(244deg) brightness(70%) contrast(70%);
 }
 
 .search-button {
@@ -147,7 +156,7 @@ body {
 }
 
 .nav-button:hover {
-    background-color: #d2d2d2;
+    background-color: #e8e8e8;
 }
 
 .nav-button.active {
