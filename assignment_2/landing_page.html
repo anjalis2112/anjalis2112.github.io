@@ -467,7 +467,7 @@
             stockSummaryTable.classList.add("stock-summary-table");
 
             const date = new Date(data.t * 1000);
-
+            const dateFormat = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
             const changePercent = data.dp;
             const changeArrow = changePercent > 0 ? "img/GreenArrowUp.png" : "img/RedArrowDown.png";
             const changeArrowImg = `<img src="${changeArrow}" alt="Change Arrow" style="width: 16px; height: 16px;">`;
@@ -487,7 +487,7 @@
                 </tr>
                 <tr>
                     <td class="align-right"><b>Trading Day</b></td>
-                    <td class="align-left">${date.toDateString()}</td>
+                    <td class="align-left">${dateFormat}</td>
                 </tr>
                 <tr>
                     <td class="align-right"><b>Previous Closing Price</b></td>
