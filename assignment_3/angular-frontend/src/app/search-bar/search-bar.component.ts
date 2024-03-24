@@ -14,6 +14,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormControl, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { Observable, of } from 'rxjs';
+import { TickerService } from '../ticker.service';
 
 
 @Component({
@@ -29,13 +31,12 @@ export class SearchBarComponent {
   isLoading = false;
   results: any = null;
   queryField: FormControl = new FormControl();
-  query: any;
   ticker: string | undefined;
   data: any;
   @ViewChild('searchForm')
   searchForm!: NgForm;
 
-  constructor(private router: Router, private apiService: ApiService) { }
+  constructor(private router: Router, private apiService: ApiService, private tickerService: TickerService) { }
 
   ngOnInit(): void {
     this.queryField.valueChanges.pipe(
@@ -60,11 +61,40 @@ export class SearchBarComponent {
     });
   }
 
-  getResults(query: string) {
-    return this.apiService.getAutoData(query);
+  getResults(query: string): Observable<any> {
+    return new Observable((observer) => {
+      this.apiService.getAutoData(query).subscribe(
+        (data: any) => {
+          // Filter the data based on the specified criteria
+          const filteredData = data.result.filter((item: any) => {
+            return item.type === 'Common Stock' && !item.displaySymbol.includes('.');
+          });
+          observer.next({ count: filteredData.length, result: filteredData });
+          observer.complete();
+        },
+        (error: any) => {
+          observer.error(error); // Pass along any errors
+        }
+      );
+    });
   }
   selectResult(result: any) {
     this.ticker = result.displaySymbol;
     this.queryField.setValue(result.displaySymbol);
+  }
+
+  clearTicker() {
+    this.queryField.setValue('');
+    this.router.navigate(['']);
+  }
+
+  
+  searchStockData(event: any) {
+    event.preventDefault();
+    event.returnValue = false;
+    if (this.ticker) {
+      this.tickerService.setTicker(this.ticker);
+    }
+    this.router.navigate(['/search', this.ticker]);
   }
 }

@@ -1,0 +1,29 @@
+.input:focus {
+    outline: none;
+}
+
+#mat-autocomplete-0 {
+    margin-left: 100px;
+    min-width: 100%;
+    /* Ensure full width */
+    top: calc(100% + 5px);
+    /* Position below input */
+}
+
+#mat-autocomplete-0 {
+    border: 1px solid #ced4da;
+    /* Add border */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Add box shadow */
+    border-radius: 0.25rem;
+    /* Add border radius */
+}
+
+#mat-autocomplete-0.mat-autocomplete-panel {
+    background-color: #fff;
+    /* Background color */
+    color: #495057;
+    /* Text color */
+    z-index: 1000;
+    /* Adjust z-index as needed */
+}

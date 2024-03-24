@@ -1,0 +1,77 @@
+<div class="container">
+    <div class="row">
+        <!-- Left Side Column -->
+        <div class="col-md-4">
+            <div class="text-center">
+                <h1>{{ ticker }}</h1>
+                <p>{{ companyName }}</p>
+                <p>{{ exchangeCode }}</p>
+            </div>
+        </div>
+
+        <!-- Middle Column -->
+        <div class="col-md-4">
+            <div class="text-center">
+                <img [src]="companyLogo" alt="Company Logo" class="img-fluid">
+            </div>
+        </div>
+
+        <!-- Right Side Column -->
+        <div class="col-md-4">
+            <div class="text-center">
+                <h2>{{ lastPrice }}</h2>
+                <p>{{ change }} ({{ changePercent }})</p>
+                <p>{{ currentTimestamp }}</p>
+            </div>
+        </div>
+    </div>
+   
+    <!-- New Row for Options -->
+    <div class="row mt-4">
+        <div class="col-md-12 text-center">
+            <button class="btn btn-primary mr-2" (click)="showSummary()">Summary</button>
+            <button class="btn btn-primary mr-2" (click)="showTopNews()">Top News</button>
+            <button class="btn btn-primary mr-2" (click)="showCharts()">Charts</button>
+            <button class="btn btn-primary" (click)="showInsights()">Insights</button>
+        </div>
+    </div>
+
+    <!-- Placeholder divs for different views -->
+    <div class="row mt-4">
+        <!-- Summary View -->
+        <div class="col-md-12" *ngIf="view === 'summary'">
+            <div>
+                <h3>High Price: {{ highPrice }}</h3>
+                <h3>Low Price: {{ lowPrice }}</h3>
+                <h3>Open Price: {{ openPrice }}</h3>
+                <h3>Prev. Close: {{ prevClosePrice }}</h3>
+                <h3>About the Company:</h3>
+                <p>IPO Start Date: {{ ipoStartDate }}</p>
+                <p>Industry: {{ industry }}</p>
+                <p>Webpage: <a [href]="webpage" target="_blank">{{ webpage }}</a></p>
+                <p>Company Peers: {{ companyPeers }}</p>
+            </div>
+            <!-- Include the hourly price variation graph using Highcharts here -->
+        </div>
+
+        <!-- Top News View -->
+        <div class="col-md-12" *ngIf="view === 'topNews'">
+            <div *ngFor="let item of news?.news">
+                    <h3>{{ item.title }}</h3>
+                    <img [src]="item.image" alt="News Image" class="img-fluid">
+            </div>
+        </div>
+
+        <!-- Charts View -->
+        <div class="col-md-12" *ngIf="view === 'charts'">
+            <!-- Include HTML for charts view -->
+            <!-- Example: <app-charts-view></app-charts-view> -->
+        </div>
+
+        <!-- Insights View -->
+        <div class="col-md-12" *ngIf="view === 'insights'">
+            <!-- Include HTML for insights view -->
+            <!-- Example: <app-insights-view></app-insights-view> -->
+        </div>
+    </div>
+</div>
