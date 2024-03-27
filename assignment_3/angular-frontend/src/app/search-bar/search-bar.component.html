@@ -2,18 +2,23 @@
     <div class="row justify-content-center mb-3 mt-3">
         <div class="col-md-5 mt-4">
             <div class="rounded-pill border border-2" style="--bs-border-color: #1d279d;">
-                <div class="input-group p-2 position-relative">
-                    <input type="text" class="form-control form-control-sm border-0 no-outline" [(ngModel)]="ticker" matInput
-                        [matAutocomplete]="auto" [formControl]="queryField" placeholder="Enter stock ticker symbol">
-                        <mat-autocomplete #auto="matAutocomplete" class="position-absolute start-0 mt-100 custom-autocomplete">
-                            <mat-option *ngIf="isLoading" class="is-loading">
-                                <mat-spinner diameter="40"></mat-spinner>
-                            </mat-option>
-                            <mat-option *ngFor="let result of results" [value]="result" (click)="selectResult(result)">
-                                {{result.displaySymbol}} | {{result.description}}
-                            </mat-option>
-                        </mat-autocomplete>
-                    <button class="btn btn-outline-secondary" type="button" style="color: #1d279d; border: none;" (click)="searchStockData($event)">
+                <div class="input-group">
+
+
+                    <input type="text" class="form-control form-control-sm border-0 no-outline" [(ngModel)]="ticker"
+                         [matAutocomplete]="auto" [formControl]="queryField" 
+                        placeholder="Enter stock ticker symbol">
+                    <mat-autocomplete #auto="matAutocomplete">
+                        <mat-option *ngIf="isLoading">
+                            <mat-spinner diameter="50"></mat-spinner>
+                            ABE YAAR DIKH JA LAUDE
+                        </mat-option>
+                        <mat-option *ngFor="let result of results" [value]="result" (click)="selectResult(result)">
+                            {{result.displaySymbol}} | {{result.description}}
+                        </mat-option>
+                    </mat-autocomplete>
+                    <button class="btn btn-outline-secondary" type="button" style="color: #1d279d; border: none;"
+                        (click)="searchStockData($event)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
                             class="bi bi-search" viewBox="0 0 16 16">
                             <path
@@ -21,7 +26,8 @@
                             </path>
                         </svg>
                     </button>
-                    <button class="btn btn-outline-secondary" type="button" style="color: #1d279d; border: none;" (click)="clearTicker()">
+                    <button class="btn btn-outline-secondary" type="button" style="color: #1d279d; border: none;"
+                        (click)="clearTicker()">
                         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
                             class="bi bi-x" viewBox="0 0 16 16">
                             <path

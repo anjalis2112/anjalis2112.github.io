@@ -87,8 +87,51 @@
 
         <!-- Insights View -->
         <div class="col-md-12" *ngIf="view === 'insights'">
-            <!-- Include HTML for insights view -->
-            <!-- Example: <app-insights-view></app-insights-view> -->
+            <div class="row">
+                <div class="col-md-3"></div>
+                <div class="col-md-6 text-center">
+                    <h2 class="m-0">Insider Sentiments</h2>
+                    <table class="table mx-auto" style="table-layout: fixed; width: 100%;">
+                        <tr>
+                            <th>{{companyName}}</th>
+                            <th>MSPR</th>
+                            <th>Change</th>
+                        </tr>
+                        <tr>
+                            <th>Total</th>
+                            <td>{{totalMSPR}}</td>
+                            <td>{{totalChange}}</td>
+                        </tr>
+                        <tr>
+                            <th>Positive</th>
+                            <td>{{positiveMSPR}}</td>
+                            <td>{{positiveChange}}</td>
+                        </tr>
+                        <tr>
+                            <th>Negative</th>
+                            <td>{{negativeMSPR}}</td>
+                            <td>{{negativeChange}}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-3"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <highcharts-chart 
+                    [Highcharts]="recommendCharts"
+                    [options]="recommendOptions"
+                    style="width: 100%; height: 325px; display: block;">
+                    </highcharts-chart>
+                </div>
+                <div class="col-md-6">
+                    <highcharts-chart 
+                    [Highcharts]="surpriseCharts"
+                    [options]="surpriseOptions"
+                    style="width: 100%; height: 325px; display: block;">
+                    </highcharts-chart>
+                </div>
+            </div>
         </div>
     </div>
 </div>

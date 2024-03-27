@@ -4,7 +4,22 @@ import { StockDetailsComponent } from './stock-details/stock-details.component';
 
 export const routes: Routes = [
     {
-        path: 'search/:ticker', 
+        path: '',
+        redirectTo: 'search/home',
+        pathMatch: 'full'
+    },
+    {
+        path: 'search',
+        redirectTo: 'search/home',
+        pathMatch: 'full'
+    },
+    {
+        path: 'search/home',
+        component: SearchBarComponent
+    },
+    {
+        path: 'search/:ticker',
         component: StockDetailsComponent
     }
 ];
+export default routes;
