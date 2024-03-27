@@ -13,6 +13,9 @@
         <div class="col-md-4">
             <div class="text-center">
                 <img [src]="companyLogo" alt="Company Logo" class="img-fluid">
+                <div *ngIf="marketClosed">
+                    Market Closed on {{ timestamp | date: 'yyyy-MM-dd HH:mm:ss' }}
+                </div>
             </div>
         </div>
 
@@ -21,7 +24,7 @@
             <div class="text-center">
                 <h2>{{ lastPrice }}</h2>
                 <p>{{ change }} ({{ changePercent }})</p>
-                <p>{{ currentTimestamp }}</p>
+                <p>{{ timestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</p>
             </div>
         </div>
     </div>
@@ -50,6 +53,14 @@
                 <p>Industry: {{ industry }}</p>
                 <p>Webpage: <a [href]="webpage" target="_blank">{{ webpage }}</a></p>
                 <p>Company Peers: {{ companyPeers }}</p>
+                <div class="col-md-6 mt-2">
+                    <highcharts-chart 
+                        [Highcharts]="hourlyCharts"
+                        [options]="hourlyOptions"
+                        [constructorType]="hourlyConstructor"
+                        style="width: 100%; height: 325px; display: block;">
+                    </highcharts-chart>
+                </div>
             </div>
             <!-- Include the hourly price variation graph using Highcharts here -->
         </div>
@@ -64,8 +75,14 @@
 
         <!-- Charts View -->
         <div class="col-md-12" *ngIf="view === 'charts'">
-            <!-- Include HTML for charts view -->
-            <!-- Example: <app-charts-view></app-charts-view> -->
+            
+                <highcharts-chart 
+                    [Highcharts]="chartTab"
+                    [options]="chartTabOptions"
+                    [constructorType]="chartTabConstructor"
+                    style="width: 100%; height: 325px; display: block;">
+                </highcharts-chart>
+            
         </div>
 
         <!-- Insights View -->

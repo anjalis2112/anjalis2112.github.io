@@ -22,6 +22,7 @@
     "@fortawesome/angular-fontawesome": "^0.14.1",
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
     "@ng-bootstrap/ng-bootstrap": "^16.0.0",
+    "highcharts": "^11.4.0",
     "highcharts-angular": "^4.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
