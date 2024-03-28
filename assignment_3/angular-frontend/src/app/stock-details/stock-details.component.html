@@ -1,9 +1,15 @@
 <div class="container">
     <div class="row">
         <!-- Left Side Column -->
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="ticker && companyName">
             <div class="text-center">
-                <h1>{{ ticker }}</h1>
+                <h1>{{ ticker.toUpperCase() }}</h1>
+                <button class="btn-star" (click)="updateFavorites(ticker, companyName)" *ngIf="!isFavorite">
+                    <i class="far fa-star"></i>
+                </button>
+                <button class="btn-star" (click)="updateFavorites(ticker)" *ngIf="isFavorite">
+                    <i class="fas fa-star" id="favorite"></i>
+                </button>
                 <p>{{ companyName }}</p>
                 <p>{{ exchangeCode }}</p>
             </div>

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { ApiService } from './api.service'; // Import ApiService here
+import { BehaviorSubject, Observable, forkJoin, throwError } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { ApiService } from './api.service';
 
 interface News {
   source: any;
@@ -27,7 +28,7 @@ interface InsiderData {
   providedIn: 'root'
 })
 export class TickerService {
-  ticker: any = null;
+  ticker: string | null = null;
   companyName: any = null;
   companyLogo: any = null;
   exchangeCode: any = null;
@@ -46,6 +47,9 @@ export class TickerService {
   industry: any = null;
   webpage: any = null;
   companyPeers: any = null;
+
+  private newsSubject = new BehaviorSubject<NewsList | undefined>(undefined);
+  news$: Observable<NewsList | undefined> = this.newsSubject.asObservable();
   news: NewsList | undefined = undefined;
   totalMSPR: any = null;
   positiveMSPR: any = null;
@@ -54,7 +58,7 @@ export class TickerService {
   positiveChange: any = null;
   negativeChange: any = null;
   view: string = '';
-  marketClosed: boolean = false;
+
 
   // Hourly chart data
   lineColor: any = null;
@@ -63,14 +67,10 @@ export class TickerService {
 
   // Chart Data
   historicalData: any = null;
-  chartTabData: any = null;
-  chartTabOptions: any = null;
 
   // Insights
   trendsData: any = null;
   surpriseData: any = null;
-  recommendOptions: any = null;
-  surpriseOptions: any = null;
 
   private tickerSubject = new BehaviorSubject<string | null>(null);
   ticker$ = this.tickerSubject.asObservable();
@@ -79,7 +79,9 @@ export class TickerService {
     // Fetch data when service is instantiated
     this.ticker$.subscribe(ticker => {
       if (ticker) {
-        this.fetchData();
+        this.fetchData().subscribe(() => {
+          // Data fetched, perform any additional actions if needed
+        });
       }
     });
   }
@@ -88,114 +90,105 @@ export class TickerService {
     this.tickerSubject.next(ticker);
   }
 
-  private fetchData() {
-    this.apiService.getProfileData(this.ticker).subscribe((profileData: any) => {
-      this.companyName = profileData.name;
-      this.companyLogo = profileData.logo;
-      this.exchangeCode = profileData.exchange;
-      this.ipoStartDate = profileData.ipo;
-      this.industry = profileData.finnhubIndustry;
-      this.webpage = profileData.weburl;
-    });
+  setNews(news: NewsList) {
+    this.news = news;
+    this.newsSubject.next(news);
+  }
 
-    // Fetch quote data
-    this.apiService.getQuoteData(this.ticker).subscribe((quoteData: any) => {
-      this.lastPrice = quoteData.c;
-      this.change = quoteData.d;
-      this.changePercent = quoteData.dp;
-      this.timestamp = new Date(quoteData.t * 1000);
-      this.highPrice = quoteData.h;
-      this.lowPrice = quoteData.l;
-      this.openPrice = quoteData.o;
-      this.prevClosePrice = quoteData.pc;
+  fetchData(): Observable<any> {
+    if (!this.ticker) {
+      return throwError("Ticker is not set");
+    }
+    return forkJoin([
+      this.apiService.getProfileData(this.ticker),
+      this.apiService.getQuoteData(this.ticker),
+      this.apiService.getNewsData(this.ticker),
+      this.apiService.getInsiderData(this.ticker),
+      this.apiService.getTrendsData(this.ticker),
+      this.apiService.getEarningsData(this.ticker),
+      this.apiService.getPeersData(this.ticker),
+      this.apiService.getHistoricalData(this.ticker),
+      this.apiService.getHourlyData(this.ticker)
+    ]).pipe(
+      tap(([profileData, quoteData, newsData, insiderData, trendsData, earningsData, peersData, historicalData, hourlyData]) => {
+        // Update properties with fetched data
+        this.companyName = profileData.name;
+        this.companyLogo = profileData.logo;
+        this.exchangeCode = profileData.exchange;
+        this.ipoStartDate = profileData.ipo;
+        this.industry = profileData.finnhubIndustry;
+        this.webpage = profileData.weburl;
 
-      setInterval(() => {
-        const currentTime = new Date().getTime();
-        const difference = (currentTime - this.timestamp.getTime()) / (1000 * 60); // Difference in minutes
-        this.marketClosed = difference >= 5; // Set marketClosed flag based on difference
-      }, 1000);
-    });
+        this.lastPrice = quoteData.c;
+        this.change = quoteData.d;
+        this.changePercent = quoteData.dp;
+        this.timestamp = new Date(quoteData.t * 1000);
+        this.highPrice = quoteData.h;
+        this.lowPrice = quoteData.l;
+        this.openPrice = quoteData.o;
+        this.prevClosePrice = quoteData.pc;
 
-    // Fetch news data
-    this.apiService.getNewsData(this.ticker).subscribe((newsData: any) => {
-      const filteredNews = newsData
-        .filter((item: any) => item.image !== null && item.title !== null && item.image !== "" && item.title !== "")
-        .map((item: any) => ({
-          source: item.source,
-          publishedDate: item.datetime,
-          title: item.headline,
-          description: item.summary,
-          url: item.url,
-          image: item.image
-        }))
-        .slice(0, 20); // Keep only the first 20 items
-      this.news = { news: filteredNews };
-    });
 
-    // Fetch insider data
-    this.apiService.getInsiderData(this.ticker).subscribe((insiderData: any) => {
-      let totalMSPR = 0;
-      let positiveMSPR = 0;
-      let negativeMSPR = 0;
+        const filteredNews = newsData
+          .filter((item: any) => item.image !== null && item.title !== null && item.image !== "" && item.title !== "")
+          .map((item: any) => ({
+            source: item.source,
+            publishedDate: item.datetime,
+            title: item.headline,
+            description: item.summary,
+            url: item.url,
+            image: item.image
+          }))
+          .slice(0, 20); // Keep only the first 20 items
+        const newsList: NewsList = { news: filteredNews };
+        this.setNews(newsList);
 
-      insiderData.data.forEach((data: InsiderData) => {
-        totalMSPR += data.mspr;
-        if (data.mspr > 0) {
-          positiveMSPR += data.mspr;
-        } else {
-          negativeMSPR += data.mspr;
-        }
-      });
+        // Update insider data
+        let totalMSPR = 0;
+        let positiveMSPR = 0;
+        let negativeMSPR = 0;
+        insiderData.data.forEach((data: InsiderData) => {
+          totalMSPR += data.mspr;
+          if (data.mspr > 0) {
+            positiveMSPR += data.mspr;
+          } else {
+            negativeMSPR += data.mspr;
+          }
+        });
+        this.totalMSPR = totalMSPR;
+        this.positiveMSPR = positiveMSPR;
+        this.negativeMSPR = negativeMSPR;
 
-      this.totalMSPR = totalMSPR;
-      this.positiveMSPR = positiveMSPR;
-      this.negativeMSPR = negativeMSPR;
+        let totalChange = 0;
+        let positiveChange = 0;
+        let negativeChange = 0;
+        insiderData.data.forEach((data: InsiderData) => {
+          totalChange += data.change;
+          if (data.change > 0) {
+            positiveChange += data.change;
+          } else {
+            negativeChange += data.change;
+          }
+        });
+        this.totalChange = totalChange;
+        this.positiveChange = positiveChange;
+        this.negativeChange = negativeChange;
 
-      let totalChange = 0;
-      let positiveChange = 0;
-      let negativeChange = 0;
+        // Update trends data
+        this.trendsData = trendsData;
 
-      insiderData.data.forEach((data: InsiderData) => {
-        totalChange += data.change;
-        if (data.change > 0) {
-          positiveChange += data.change;
-        } else {
-          negativeChange += data.change;
-        }
-      });
+        // Update earnings data
+        this.surpriseData = earningsData;
 
-      this.totalChange = totalChange;
-      this.positiveChange = positiveChange;
-      this.negativeChange = negativeChange;
-    });
+        // Update peers data
+        this.companyPeers = peersData;
 
-    // Fetch trends data
-    this.apiService.getTrendsData(this.ticker).subscribe((trendsData: any) => {
-      this.trendsData = trendsData;
-      // Assign trends data
-    });
+        // Update historical data
+        this.historicalData = historicalData;
 
-    // Fetch earnings data
-    this.apiService.getEarningsData(this.ticker).subscribe((surpriseData: any) => {
-      this.surpriseData = surpriseData.earnings;
-      // Assign earnings data
-    });
-
-    // Fetch peers data
-    this.apiService.getPeersData(this.ticker).subscribe((peersData: any) => {
-      this.companyPeers = peersData; // Assuming the response structure matches your peers data
-    });
-
-    // Fetch historical data
-    this.apiService.getHistoricalData(this.ticker).subscribe((historicalData: any) => {
-      this.historicalData = historicalData;
-      // Assign historical data
-    });
-
-    // Fetch hourly data
-    this.apiService.getHourlyData(this.ticker).subscribe((hourlyData: any) => {
-      this.hourlyData = hourlyData;
-      // Assign hourly data
-    });
+        // Update hourly data
+        this.hourlyData = hourlyData;
+      })
+    );
   }
 }

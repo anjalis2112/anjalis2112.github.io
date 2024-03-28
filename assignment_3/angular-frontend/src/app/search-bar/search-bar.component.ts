@@ -8,6 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormControl, NgForm, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { TickerService } from '../ticker.service';
+import { StockDetailsComponent } from '../stock-details/stock-details.component';
 
 
 
@@ -19,6 +20,7 @@ import { TickerService } from '../ticker.service';
     FormsModule,
     MatProgressSpinnerModule,
     ReactiveFormsModule,
+    StockDetailsComponent
   ],
   templateUrl: './search-bar.component.html',
   styleUrls: ['./search-bar.component.css']
@@ -44,12 +46,10 @@ export class SearchBarComponent implements OnInit {
         return;
       }
       this.isLoading = true;
-      console.log(this.isLoading);
       this.getResults(query.trim()).subscribe(
         (data: any) => {
           this.isLoading = false;
           this.results = data.result;
-          console.log(this.isLoading);
         },
         () => {
           this.isLoading = false;
@@ -91,7 +91,8 @@ export class SearchBarComponent implements OnInit {
     event.preventDefault();
     event.returnValue = false;
     if (this.ticker) {
-      this.tickerService.setTicker(this.ticker);
+      this.tickerService.ticker = this.ticker; // Set the ticker property
+      this.tickerService.setTicker(this.ticker); // Call setTicker() method
     }
     this.router.navigate(['/search', this.ticker]);
   }

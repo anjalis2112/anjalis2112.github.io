@@ -7,10 +7,11 @@ import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DatePipe } from '@angular/common';
 import { HighchartsChartModule } from 'highcharts-angular';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FavoriteData } from '../favorite.interface';
 import * as Highcharts from 'highcharts/highstock';
 import indicators from 'highcharts/indicators/indicators';
 import vbp from 'highcharts/indicators/volume-by-price';
-
 
 indicators(Highcharts);
 vbp(Highcharts);
@@ -28,20 +29,12 @@ interface NewsList {
     news: News[];
 }
 
-interface InsiderData {
-    symbol: string;
-    year: number;
-    month: number;
-    change: number;
-    mspr: number;
-}
-
 @Component({
     standalone: true,
     selector: 'app-stock-details',
     templateUrl: './stock-details.component.html',
     styleUrls: ['./stock-details.component.css'],
-    imports: [CommonModule, RouterModule, HttpClientModule, NgbModule, HighchartsChartModule],
+    imports: [CommonModule, RouterModule, HttpClientModule, NgbModule, HighchartsChartModule, FontAwesomeModule],
     providers: [DatePipe]
 })
 export class StockDetailsComponent implements OnInit {
@@ -97,407 +90,374 @@ export class StockDetailsComponent implements OnInit {
     surpriseCharts: typeof Highcharts = Highcharts;
     surpriseOptions: Highcharts.Options = {};
 
-    constructor(private apiService: ApiService, private tickerService: TickerService, private datePipe: DatePipe) { }
+    isFavorite: boolean = false;
+
+    constructor(private tickerService: TickerService, private apiService: ApiService) { }
 
     ngOnInit(): void {
-        this.showSummary();
         this.tickerService.ticker$.subscribe(ticker => {
             this.ticker = ticker;
-            // Use the ticker value for further processing
-
-            // Fetching profile data
-            this.apiService.getProfileData(this.ticker).subscribe((profileData: any) => {
-                this.companyName = profileData.name;
-                this.companyLogo = profileData.logo;
-                this.exchangeCode = profileData.exchange;
-                this.ipoStartDate = profileData.ipo;
-                this.industry = profileData.finnhubIndustry;
-                this.webpage = profileData.weburl;
-            });
-
-            // Fetching quote data
-            this.apiService.getQuoteData(this.ticker).subscribe((quoteData: any) => {
-                this.lastPrice = quoteData.c;
-                this.change = quoteData.d;
-                this.changePercent = quoteData.dp;
-                this.timestamp = new Date(quoteData.t * 1000);
-                this.highPrice = quoteData.h;
-                this.lowPrice = quoteData.l;
-                this.openPrice = quoteData.o;
-                this.prevClosePrice = quoteData.pc;
-
-                setInterval(() => {
-                    const currentTime = new Date().getTime();
-                    const difference = (currentTime - this.timestamp.getTime()) / (1000 * 60); // Difference in minutes
-                    this.marketClosed = difference >= 5; // Set marketClosed flag based on difference
-                }, 1000);
-            });
-
-            // Fetching news data
-
-            this.apiService.getNewsData(this.ticker).subscribe((newsData: any) => {
-                const filteredNews = newsData
-                    .filter((item: any) => item.image !== null && item.title !== null && item.image !== "" && item.title !== "")
-                    .map((item: any) => ({
-                        source: item.source,
-                        publishedDate: item.datetime,
-                        title: item.headline,
-                        description: item.summary,
-                        url: item.url,
-                        image: item.image
-                    }))
-                    .slice(0, 20); // Keep only the first 20 items
-
-                // Assign the filtered and mapped data to the news property
-                this.news = { news: filteredNews };
-            });
-
-            // Fetching insider data
-            this.apiService.getInsiderData(this.ticker).subscribe((insiderData: any) => {
-                let totalMSPR = 0;
-                let positiveMSPR = 0;
-                let negativeMSPR = 0;
-
-                insiderData.data.forEach((data: InsiderData) => {
-                    totalMSPR += data.mspr;
-                    if (data.mspr > 0) {
-                        positiveMSPR += data.mspr;
-                    } else {
-                        negativeMSPR += data.mspr;
-                    }
-                });
-
-                this.totalMSPR = totalMSPR;
-                this.positiveMSPR = positiveMSPR;
-                this.negativeMSPR = negativeMSPR;
-
-                let totalChange = 0;
-                let positiveChange = 0;
-                let negativeChange = 0;
-
-                insiderData.data.forEach((data: InsiderData) => {
-                    totalChange += data.change;
-                    if (data.change > 0) {
-                        positiveChange += data.change;
-                    } else {
-                        negativeChange += data.change;
-                    }
-                });
-                this.totalChange = totalChange;
-                this.positiveChange = positiveChange;
-                this.negativeChange = negativeChange;
-
-            });
-
-            // Fetching trends data
-            this.apiService.getTrendsData(this.ticker).subscribe((trendsData: any) => {
-                this.trendsData = trendsData;
-                let period: any[] = [], strongBuy: any[] = [], buy: any[] = [], hold: any[] = [], sell: any[] = [], strongSell: any[] = [];
-                if (trendsData.length) {
-                    for (let i = 0; i < trendsData.length; i++) {
-                        let length = trendsData[i].period.length;
-                        period.push(trendsData[i].period.substring(0, length - 3));
-                        strongBuy.push(trendsData[i].strongBuy);
-                        buy.push(trendsData[i].buy);
-                        hold.push(trendsData[i].hold);
-                        sell.push(trendsData[i].sell);
-                        strongSell.push(trendsData[i].strongSell);
-                    }
-
-                }
-                this.recommendOptions = {
-                    chart: {
-                        type: 'column',
-                        backgroundColor: '#f4f4f4',
-                    },
-                    title: {
-                        text: 'Recommendation Trends'
-                    },
-                    xAxis: {
-                        categories: period,
-                        //crosshair: true
-                    },
-                    yAxis: {
-                        min: 0,
-                        title: {
-                            text: '#Analysis'
-                        },
-                    },
-                    plotOptions: {
-                        column: {
-                            stacking: 'normal',
-                            dataLabels: {
-                                enabled: true
-                            }
-                        }
-                    },
-                    series: [{
-                        name: 'Strong Buy',
-                        data: strongBuy,
-                        type: 'column',
-                        color: 'darkgreen',
-                    }, {
-                        name: 'Buy',
-                        data: buy,
-                        type: 'column',
-                        color: 'green',
-                    }, {
-                        name: 'Hold',
-                        data: hold,
-                        type: 'column',
-                        color: '#B07E28',
-                    }, {
-                        name: 'Sell',
-                        data: sell,
-                        type: 'column',
-                        color: 'red',
-                    }, {
-                        name: 'Strong Sell',
-                        data: strongSell,
-                        type: 'column',
-                        color: 'darkred',
-                    }],
-                }
-            });
-
-            // Fetching earnings data
-            this.apiService.getEarningsData(this.ticker).subscribe((surpriseData: any) => {
-                this.surpriseData = surpriseData.earnings;
-                let period: any[] = []
-                let actual: any[] = [], estimate: any[] = [], surprise: Number[] = [];
-                if (surpriseData.length) {
-                    for (let i = 0; i < surpriseData.length; i++) {
-                        period.push(surpriseData[i].period);
-                        actual.push(surpriseData[i].actual);
-                        estimate.push(surpriseData[i].estimate);
-                        surprise.push(surpriseData[i].surprise);
-                    }
-                }
-                this.surpriseOptions = {
-                    chart: {
-                        type: 'spline',
-                        backgroundColor: '#f4f4f4',
-                    },
-                    title: {
-                        text: 'Historical EPS Surprises'
-                    },
-                    xAxis: {
-                        categories: period,
-                        // showLastLabel: true,
-                        labels: {
-                            useHTML: true,
-                            formatter: function () {
-                                let surpriseValue = surprise[this.pos];
-                                return '<div style="text-align: center;">' + this.value + '<br><span>Surprise: ' + surpriseValue + '</span></div>';
-                            }
-                        }
-                    },
-                    yAxis: {
-                        title: {
-                            text: 'Quantity EPS'
-                        },
-                    },
-                    series: [{
-                        name: 'Actual',
-                        data: actual,
-                        type: 'spline',
-                    }, {
-                        name: 'Estimate',
-                        data: estimate,
-                        type: 'spline',
-                    }]
-                }
-            })
-
-            // Fetching peers data
-            this.apiService.getPeersData(this.ticker).subscribe((peersData: any) => {
-                this.companyPeers = peersData; // Assuming the response structure matches your peers data
-            });
-
-            this.apiService.getHistoricalData(this.ticker).subscribe((historicalData: any) => {
-                this.historicalData = historicalData;
-                const ohlc: any[] = [], volume: any[] = [];
-                if (historicalData.results && historicalData.results.length) {
-                    for (let i = 0; i < historicalData.results.length; i += 1) {
-                        ohlc.push([
-                            historicalData.results[i].t, // the date
-                            historicalData.results[i].o, // open
-                            historicalData.results[i].h, // high
-                            historicalData.results[i].l, // low
-                            historicalData.results[i].c // close
-                        ]);
-
-                        volume.push([
-                            historicalData.results[i].t, // the date
-                            historicalData.results[i].v // the volume
-                        ]);
-                    }
-                }
-
-                this.chartTabOptions = {
-                    rangeSelector: {
-                        buttons: [{
-                            'type': 'month',
-                            'count': 1,
-                            'text': '1m',
-                        }, {
-                            'type': 'month',
-                            'count': 3,
-                            'text': '3m',
-                        }, {
-                            'type': 'month',
-                            'count': 6,
-                            'text': '6m',
-                        }, {
-                            'type': 'ytd',
-                            'text': 'YTD',
-                        }, {
-                            'type': 'year',
-                            'count': 1,
-                            'text': '1Y',
-                        }, {
-                            'type': 'all',
-                            'text': 'All',
-                        }],
-                        selected: 2, // set 6m as default
-                    },
-                    title: { text: historicalData.ticker + ' Historical' },
-                    subtitle: { text: 'With SMA and Volume by Price technical indicators' },
-                    xAxis: {
-                        type: 'datetime'
-                    },
-                    yAxis: [{
-                        startOnTick: false,
-                        endOnTick: false,
-                        labels: {
-                            align: 'right',
-                            x: -3
-                        },
-                        title: {
-                            text: 'OHLC'
-                        },
-                        height: '60%',
-                        lineWidth: 2,
-                        resize: {
-                            enabled: true
-                        }
-                    }, {
-                        labels: {
-                            align: 'right',
-                            x: -3
-                        },
-                        title: {
-                            text: 'Volume'
-                        },
-                        top: '65%',
-                        height: '35%',
-                        offset: 0,
-                        lineWidth: 2
-                    }],
-                    tooltip: {
-                        split: true
-                    },
-                    chart: {
-                        backgroundColor: '#f4f4f4',
-                    },
-                    series: [{
-                        type: 'candlestick',
-                        name: historicalData.ticker,
-                        id: historicalData.ticker,
-                        zIndex: 2,
-                        data: ohlc
-                    }, {
-                        type: 'column',
-                        name: 'Volume',
-                        id: 'volume',
-                        data: volume,
-                        yAxis: 1
-                    }, {
-                        type: 'vbp',
-                        linkedTo: historicalData.ticker,
-                        params: {
-                            volumeSeriesID: 'volume'
-                        },
-                        dataLabels: {
-                            enabled: false
-                        },
-                        zoneLines: {
-                            enabled: false
-                        }
-                    }, {
-                        type: 'sma',
-                        linkedTo: historicalData.ticker,
-                        zIndex: 1,
-                        marker: {
-                            enabled: false
-                        }
-                    }],
-                    time: {
-                        useUTC: false,
-                        timezone: 'America/Los_Angeles'
-                    },
-                }
-
-            });
-
-            this.apiService.getHourlyData(this.ticker).subscribe((hourlyData: any) => {
-                this.hourlyData = hourlyData;
-                const priceData: [number, number][] = [];
-                if (hourlyData.results && hourlyData.results.length) {
-                    for (let i = hourlyData.results.length - 1; i >= 0; i--) {
-                        priceData.unshift([hourlyData.results[i].t, hourlyData.results[i].c]);
-                        if (priceData.length >= 32) {
-                            break;
-                        }
-                    }
-                }
-                if (this.change > 0) {
-                    this.lineColor = 'green';
-                }
-                else {
-                    this.lineColor = 'red';
-                }
-                this.hourlyOptions = {
-                    colors: [this.lineColor],
-                    rangeSelector: {
-                        enabled: false
-                    },
-                    navigator: {
-                        enabled: false
-                    },
-                    title: {
-                        text: hourlyData.ticker + ' Hourly Price Variation',
-                        style: {
-                            color: 'gray',
-                        },
-                    },
-                    xAxis: {
-                        type: 'datetime',
-                    },
-                    series: [{
-                        name: hourlyData.ticker,
-                        data: priceData,
-                        type: 'line',
-                    }],
-                    tooltip: {
-                        split: true,
-                    },
-                    time: {
-                        useUTC: false,
-                        timezone: 'America/Los_Angeles'
-                    },
-                    legend: {
-                        enabled: false
-                    },
-                    chart: {
-                        backgroundColor: '#f4f4f4',
-                    },
-                };
-
-
+            this.tickerService.fetchData().subscribe(() => {
+                this.setValues();
             });
         });
+
+        this.checkMarketClose();
     }
+
+    private setValues() {
+        this.companyName = this.tickerService.companyName;
+        this.companyLogo = this.tickerService.companyLogo;
+        this.exchangeCode = this.tickerService.exchangeCode;
+        this.lastPrice = this.tickerService.lastPrice;
+        this.change = this.tickerService.change;
+        this.changePercent = this.tickerService.changePercent;
+        this.timestamp = this.tickerService.timestamp;
+        this.highPrice = this.tickerService.highPrice;
+        this.lowPrice = this.tickerService.lowPrice;
+        this.openPrice = this.tickerService.openPrice;
+        this.prevClosePrice = this.tickerService.prevClosePrice;
+        this.ipoStartDate = this.tickerService.ipoStartDate;
+        this.industry = this.tickerService.industry;
+        this.webpage = this.tickerService.webpage;
+        this.companyPeers = this.tickerService.companyPeers;
+        this.news = this.tickerService.news;
+        this.totalMSPR = this.tickerService.totalMSPR;
+        this.positiveMSPR = this.tickerService.positiveMSPR;
+        this.negativeMSPR = this.tickerService.negativeMSPR;
+        this.totalChange = this.tickerService.totalChange;
+        this.positiveChange = this.tickerService.positiveChange;
+        this.negativeChange = this.tickerService.negativeChange;
+        this.hourlyData = this.tickerService.hourlyData;
+        this.hourlyOptions = this.tickerService.hourlyOptions;
+        this.historicalData = this.tickerService.historicalData;
+        this.trendsData = this.tickerService.trendsData;
+        this.surpriseData = this.tickerService.surpriseData;
+
+        this.createHourlyChart();
+        this.createChartTab();
+        this.createRecommendChart();
+        this.createSurpriseChart();
+        this.checkFavoriteStatus()
+        this.showSummary();
+
+    }
+
+    createHourlyChart() {
+        const priceData: [number, number][] = [];
+        if (this.hourlyData.results && this.hourlyData.results.length) {
+            for (let i = this.hourlyData.results.length - 1; i >= 0; i--) {
+                priceData.unshift([this.hourlyData.results[i].t, this.hourlyData.results[i].c]);
+                if (priceData.length >= 32) {
+                    break;
+                }
+            }
+        }
+        if (this.change > 0) {
+            this.lineColor = 'green';
+        }
+        else {
+            this.lineColor = 'red';
+        }
+        this.hourlyOptions = {
+            colors: [this.lineColor],
+            rangeSelector: {
+                enabled: false
+            },
+            navigator: {
+                enabled: false
+            },
+            title: {
+                text: this.hourlyData.ticker + ' Hourly Price Variation',
+                style: {
+                    color: 'gray',
+                },
+            },
+            xAxis: {
+                type: 'datetime',
+            },
+            series: [{
+                name: this.hourlyData.ticker,
+                data: priceData,
+                type: 'line',
+            }],
+            tooltip: {
+                split: true,
+            },
+            time: {
+                useUTC: false,
+                timezone: 'America/Los_Angeles'
+            },
+            legend: {
+                enabled: false
+            },
+            chart: {
+                backgroundColor: '#f4f4f4',
+            },
+        };
+    }
+
+    checkMarketClose() {
+        setInterval(() => {
+            const currentTime = new Date().getTime();
+            const difference = (currentTime - this.timestamp.getTime()) / (1000 * 60); // Difference in minutes
+            this.marketClosed = difference >= 5; // Set marketClosed flag based on difference
+          }, 1000);
+    }
+
+    createChartTab() {
+        const ohlc: any[] = [], volume: any[] = [];
+        if (this.historicalData.results && this.historicalData.results.length) {
+            for (let i = 0; i < this.historicalData.results.length; i += 1) {
+                ohlc.push([
+                    this.historicalData.results[i].t, // the date
+                    this.historicalData.results[i].o, // open
+                    this.historicalData.results[i].h, // high
+                    this.historicalData.results[i].l, // low
+                    this.historicalData.results[i].c // close
+                ]);
+
+                volume.push([
+                    this.historicalData.results[i].t, // the date
+                    this.historicalData.results[i].v // the volume
+                ]);
+            }
+        }
+
+        this.chartTabOptions = {
+            rangeSelector: {
+                buttons: [{
+                    'type': 'month',
+                    'count': 1,
+                    'text': '1m',
+                }, {
+                    'type': 'month',
+                    'count': 3,
+                    'text': '3m',
+                }, {
+                    'type': 'month',
+                    'count': 6,
+                    'text': '6m',
+                }, {
+                    'type': 'ytd',
+                    'text': 'YTD',
+                }, {
+                    'type': 'year',
+                    'count': 1,
+                    'text': '1Y',
+                }, {
+                    'type': 'all',
+                    'text': 'All',
+                }],
+                selected: 2, // set 6m as default
+            },
+            title: { text: this.historicalData.ticker + ' Historical' },
+            subtitle: { text: 'With SMA and Volume by Price technical indicators' },
+            xAxis: {
+                type: 'datetime'
+            },
+            yAxis: [{
+                startOnTick: false,
+                endOnTick: false,
+                labels: {
+                    align: 'right',
+                    x: -3
+                },
+                title: {
+                    text: 'OHLC'
+                },
+                height: '60%',
+                lineWidth: 2,
+                resize: {
+                    enabled: true
+                }
+            }, {
+                labels: {
+                    align: 'right',
+                    x: -3
+                },
+                title: {
+                    text: 'Volume'
+                },
+                top: '65%',
+                height: '35%',
+                offset: 0,
+                lineWidth: 2
+            }],
+            tooltip: {
+                split: true
+            },
+            chart: {
+                backgroundColor: '#f4f4f4',
+            },
+            series: [{
+                type: 'candlestick',
+                name: this.historicalData.ticker,
+                id: this.historicalData.ticker,
+                zIndex: 2,
+                data: ohlc
+            }, {
+                type: 'column',
+                name: 'Volume',
+                id: 'volume',
+                data: volume,
+                yAxis: 1
+            }, {
+                type: 'vbp',
+                linkedTo: this.historicalData.ticker,
+                params: {
+                    volumeSeriesID: 'volume'
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                zoneLines: {
+                    enabled: false
+                }
+            }, {
+                type: 'sma',
+                linkedTo: this.historicalData.ticker,
+                zIndex: 1,
+                marker: {
+                    enabled: false
+                }
+            }],
+            time: {
+                useUTC: false,
+                timezone: 'America/Los_Angeles'
+            },
+        }
+    }
+
+    createRecommendChart() {
+        let period: any[] = [], strongBuy: any[] = [], buy: any[] = [], hold: any[] = [], sell: any[] = [], strongSell: any[] = [];
+        if (this.trendsData.length) {
+            for (let i = 0; i < this.trendsData.length; i++) {
+                let length = this.trendsData[i].period.length;
+                period.push(this.trendsData[i].period.substring(0, length - 3));
+                strongBuy.push(this.trendsData[i].strongBuy);
+                buy.push(this.trendsData[i].buy);
+                hold.push(this.trendsData[i].hold);
+                sell.push(this.trendsData[i].sell);
+                strongSell.push(this.trendsData[i].strongSell);
+            }
+
+        }
+        this.recommendOptions = {
+            chart: {
+                type: 'column',
+                backgroundColor: '#f4f4f4',
+            },
+            title: {
+                text: 'Recommendation Trends'
+            },
+            xAxis: {
+                categories: period,
+                //crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: '#Analysis'
+                },
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    dataLabels: {
+                        enabled: true
+                    }
+                }
+            },
+            series: [{
+                name: 'Strong Buy',
+                data: strongBuy,
+                type: 'column',
+                color: 'darkgreen',
+            }, {
+                name: 'Buy',
+                data: buy,
+                type: 'column',
+                color: 'green',
+            }, {
+                name: 'Hold',
+                data: hold,
+                type: 'column',
+                color: '#B07E28',
+            }, {
+                name: 'Sell',
+                data: sell,
+                type: 'column',
+                color: 'red',
+            }, {
+                name: 'Strong Sell',
+                data: strongSell,
+                type: 'column',
+                color: 'darkred',
+            }],
+        }
+    }
+
+    createSurpriseChart() {
+        console.log(this.surpriseData);
+        let period: any[] = []
+        let actual: any[] = [], estimate: any[] = [], surprise: Number[] = [];
+        if (this.surpriseData.length) {
+            for (let i = 0; i < this.surpriseData.length; i++) {
+                period.push(this.surpriseData[i].period);
+                actual.push(this.surpriseData[i].actual);
+                estimate.push(this.surpriseData[i].estimate);
+                surprise.push(this.surpriseData[i].surprise);
+            }
+        }
+        this.surpriseOptions = {
+            chart: {
+                type: 'spline',
+                backgroundColor: '#f4f4f4',
+            },
+            title: {
+                text: 'Historical EPS Surprises'
+            },
+            xAxis: {
+                categories: period,
+                // showLastLabel: true,
+                labels: {
+                    useHTML: true,
+                    formatter: function () {
+                        let surpriseValue = surprise[this.pos];
+                        return '<div style="text-align: center;">' + this.value + '<br><span>Surprise: ' + surpriseValue + '</span></div>';
+                    }
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'Quantity EPS'
+                },
+            },
+            series: [{
+                name: 'Actual',
+                data: actual,
+                type: 'spline',
+            }, {
+                name: 'Estimate',
+                data: estimate,
+                type: 'spline',
+            }]
+        }
+    }
+
+    checkFavoriteStatus() {
+        this.apiService.getFavorites().subscribe(favorites => {
+          const favoritesArray = favorites as FavoriteData[];
+          this.isFavorite = favoritesArray.some(favorite => favorite.ticker === this.ticker);
+        });
+      }
+      updateFavorites(ticker: string, name?: string) {
+        this.apiService.updateFavorites(ticker, name).subscribe(data => {
+          console.log('update favorites', ticker, name)
+        });
+        this.isFavorite = !this.isFavorite;
+      }
 
     showSummary() {
         this.view = 'summary';
@@ -517,5 +477,4 @@ export class StockDetailsComponent implements OnInit {
     showInsights() {
         this.view = 'insights';
     }
-
 }
