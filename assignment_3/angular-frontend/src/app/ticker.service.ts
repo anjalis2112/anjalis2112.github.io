@@ -90,6 +90,10 @@ export class TickerService {
     this.tickerSubject.next(ticker);
   }
 
+  clearTicker() {
+    this.tickerSubject.next(''); // or this.tickerSubject.next(null);
+  }
+
   setNews(news: NewsList) {
     this.news = news;
     this.newsSubject.next(news);

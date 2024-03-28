@@ -19,7 +19,7 @@ export const routes: Routes = [
     },
     {
         path: 'search/:ticker',
-        component: StockDetailsComponent
+        component: SearchBarComponent
     }
 ];
 export default routes;

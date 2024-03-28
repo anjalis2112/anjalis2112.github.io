@@ -12,6 +12,8 @@ import { FavoriteData } from '../favorite.interface';
 import * as Highcharts from 'highcharts/highstock';
 import indicators from 'highcharts/indicators/indicators';
 import vbp from 'highcharts/indicators/volume-by-price';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MdbTabsModule } from 'mdb-angular-ui-kit/tabs';
 
 indicators(Highcharts);
 vbp(Highcharts);
@@ -34,7 +36,7 @@ interface NewsList {
     selector: 'app-stock-details',
     templateUrl: './stock-details.component.html',
     styleUrls: ['./stock-details.component.css'],
-    imports: [CommonModule, RouterModule, HttpClientModule, NgbModule, HighchartsChartModule, FontAwesomeModule],
+    imports: [CommonModule, RouterModule, HttpClientModule, NgbModule, HighchartsChartModule, FontAwesomeModule, MatTabsModule, MdbTabsModule],
     providers: [DatePipe]
 })
 export class StockDetailsComponent implements OnInit {
@@ -95,6 +97,8 @@ export class StockDetailsComponent implements OnInit {
     constructor(private tickerService: TickerService, private apiService: ApiService) { }
 
     ngOnInit(): void {
+        console.log("IM HEREEE")
+        
         this.tickerService.ticker$.subscribe(ticker => {
             this.ticker = ticker;
             this.tickerService.fetchData().subscribe(() => {
@@ -138,8 +142,7 @@ export class StockDetailsComponent implements OnInit {
         this.createChartTab();
         this.createRecommendChart();
         this.createSurpriseChart();
-        this.checkFavoriteStatus()
-        this.showSummary();
+        this.checkFavoriteStatus();
 
     }
 
@@ -399,7 +402,6 @@ export class StockDetailsComponent implements OnInit {
     }
 
     createSurpriseChart() {
-        console.log(this.surpriseData);
         let period: any[] = []
         let actual: any[] = [], estimate: any[] = [], surprise: Number[] = [];
         if (this.surpriseData.length) {
@@ -454,27 +456,7 @@ export class StockDetailsComponent implements OnInit {
       }
       updateFavorites(ticker: string, name?: string) {
         this.apiService.updateFavorites(ticker, name).subscribe(data => {
-          console.log('update favorites', ticker, name)
         });
         this.isFavorite = !this.isFavorite;
       }
-
-    showSummary() {
-        this.view = 'summary';
-    }
-
-    // Method to show top news view
-    showTopNews() {
-        this.view = 'topNews';
-    }
-
-    // Method to show charts view
-    showCharts() {
-        this.view = 'charts';
-    }
-
-    // Method to show insights view
-    showInsights() {
-        this.view = 'insights';
-    }
 }

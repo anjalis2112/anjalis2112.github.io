@@ -35,9 +35,10 @@ export class SearchBarComponent implements OnInit {
   @ViewChild('searchForm')
   searchForm!: NgForm;
 
-  constructor(private router: Router, private apiService: ApiService, private tickerService: TickerService) { }
+  constructor(private router: Router, private apiService: ApiService, public tickerService: TickerService) { }
 
   ngOnInit(): void {
+    this.ticker = this.tickerService.ticker || undefined;;
     this.queryField.valueChanges.pipe(
       debounceTime(500)
     ).subscribe((query: string) => {
@@ -85,12 +86,16 @@ export class SearchBarComponent implements OnInit {
   clearTicker() {
     this.queryField.setValue('');
     this.router.navigate(['']);
+    this.ticker = '';
+    this.tickerService.clearTicker();
   }
 
   searchStockData(event: any) {
+    console.log("HELLO")
     event.preventDefault();
     event.returnValue = false;
     if (this.ticker) {
+      console.log("HELLO2")
       this.tickerService.ticker = this.ticker; // Set the ticker property
       this.tickerService.setTicker(this.ticker); // Call setTicker() method
     }
