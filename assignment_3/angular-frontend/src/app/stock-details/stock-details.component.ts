@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { ApiService } from '../api.service';
 import { TickerService } from '../ticker.service';
 import { CommonModule } from '@angular/common';
@@ -40,8 +40,7 @@ interface NewsList {
     providers: [DatePipe]
 })
 export class StockDetailsComponent implements OnInit {
-
-    ticker: any;
+    @Input() ticker: any;
     companyName: any;
     companyLogo: any;
     exchangeCode: any;

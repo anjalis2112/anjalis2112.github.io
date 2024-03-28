@@ -91,7 +91,8 @@ export class TickerService {
   }
 
   clearTicker() {
-    this.tickerSubject.next(''); // or this.tickerSubject.next(null);
+    this.ticker = ''; // Clear the ticker property
+    this.tickerSubject.next(''); // Update the ticker subject
   }
 
   setNews(news: NewsList) {
@@ -111,8 +112,10 @@ export class TickerService {
       this.apiService.getTrendsData(this.ticker),
       this.apiService.getEarningsData(this.ticker),
       this.apiService.getPeersData(this.ticker),
-      this.apiService.getHistoricalData(this.ticker),
-      this.apiService.getHourlyData(this.ticker)
+      this.apiService.getEarningsData(this.ticker),
+      this.apiService.getPeersData(this.ticker),
+      //this.apiService.getHistoricalData(this.ticker),
+      //this.apiService.getHourlyData(this.ticker)
     ]).pipe(
       tap(([profileData, quoteData, newsData, insiderData, trendsData, earningsData, peersData, historicalData, hourlyData]) => {
         // Update properties with fetched data

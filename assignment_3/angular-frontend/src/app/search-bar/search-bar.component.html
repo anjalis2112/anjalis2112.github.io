@@ -6,8 +6,7 @@
 
 
                     <input type="text" class="form-control form-control-sm border-0 no-outline" [(ngModel)]="ticker"
-                         [matAutocomplete]="auto" [formControl]="queryField" 
-                        placeholder="Enter stock ticker symbol">
+                        [matAutocomplete]="auto" [formControl]="queryField" placeholder="Enter stock ticker symbol">
                     <mat-autocomplete #auto="matAutocomplete">
                         <mat-option *ngIf="isLoading">
                             <mat-spinner diameter="50"></mat-spinner>
@@ -40,7 +39,6 @@
         </div>
     </div>
 </form>
-<div *ngIf="tickerService.ticker">
-    
-    <app-stock-details></app-stock-details>
+<div *ngIf="tickerService.ticker !== null && tickerService.ticker !== ''">
+    <app-stock-details [ticker]="tickerService.ticker"></app-stock-details>
 </div>

@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container" *ngIf="ticker && companyName">
     <div class="row">
         <!-- Left Side Column -->
         <div class="col-md-4" *ngIf="ticker && companyName">
@@ -21,6 +21,9 @@
                 <img [src]="companyLogo" alt="Company Logo" class="img-fluid">
                 <div *ngIf="marketClosed">
                     Market Closed on {{ timestamp | date: 'yyyy-MM-dd HH:mm:ss' }}
+                </div>
+                <div *ngIf="!marketClosed">
+                    Market is Open
                 </div>
             </div>
         </div>
@@ -135,8 +138,6 @@
             </mat-tab>
 
         </mat-tab-group>
-            
-       
     </div>
 </div>
 

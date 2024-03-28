@@ -9,14 +9,15 @@ import { FormControl, NgForm, ReactiveFormsModule, FormsModule } from '@angular/
 import { Observable, of } from 'rxjs';
 import { TickerService } from '../ticker.service';
 import { StockDetailsComponent } from '../stock-details/stock-details.component';
+import { ElementRef } from '@angular/core';
 
 
 
 @Component({
   selector: 'ng-search-bar',
   standalone: true,
-  imports: [CommonModule, 
-    MatAutocompleteModule, 
+  imports: [CommonModule,
+    MatAutocompleteModule,
     FormsModule,
     MatProgressSpinnerModule,
     ReactiveFormsModule,
@@ -35,7 +36,7 @@ export class SearchBarComponent implements OnInit {
   @ViewChild('searchForm')
   searchForm!: NgForm;
 
-  constructor(private router: Router, private apiService: ApiService, public tickerService: TickerService) { }
+  constructor(private router: Router, private apiService: ApiService, public tickerService: TickerService, private elementRef: ElementRef) { }
 
   ngOnInit(): void {
     this.ticker = this.tickerService.ticker || undefined;;
@@ -84,10 +85,15 @@ export class SearchBarComponent implements OnInit {
   }
 
   clearTicker() {
-    this.queryField.setValue('');
-    this.router.navigate(['']);
-    this.ticker = '';
-    this.tickerService.clearTicker();
+    this.ticker = ''; // Set ticker to an empty string
+    this.queryField.setValue(''); // Clear the FormControl value
+    // Clear the input field by directly manipulating its DOM element
+    const inputElement: HTMLInputElement = this.elementRef.nativeElement.querySelector('input');
+    if (inputElement) {
+      inputElement.value = '';
+    }
+    this.router.navigate(['']); // Navigate away
+    this.tickerService.clearTicker(); // Clear the ticker in the service
   }
 
   searchStockData(event: any) {
