@@ -17,6 +17,11 @@ import { MdbTabsModule } from 'mdb-angular-ui-kit/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NewsCardComponent } from '../newscard/newscard.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Subject } from 'rxjs';
+import { PortfolioCardsComponent } from '../portfolio-cards/portfolio-cards.component';
+import { PortfolioCardShowService } from '../portfolio-card-show.service';
+import { DataStorerService } from '../data-storer.service';
+import {MatDialogModule, MatDialog} from '@angular/material/dialog';
 
 indicators(Highcharts);
 vbp(Highcharts);
@@ -37,12 +42,20 @@ interface NewsList {
     news: News[];
 }
 
+interface HoldingData {
+    id: number;
+    ticker: string;
+    name: string;
+    quantity: number;
+    cost: number;
+  }
+
 @Component({
     standalone: true,
     selector: 'app-stock-details',
     templateUrl: './stock-details.component.html',
     styleUrls: ['./stock-details.component.css'],
-    imports: [CommonModule, RouterModule, HttpClientModule, NgbModule, HighchartsChartModule, FontAwesomeModule, MatTabsModule, MdbTabsModule, MatProgressSpinnerModule, NewsCardComponent],
+    imports: [CommonModule, RouterModule,MatDialogModule, HttpClientModule, NgbModule, HighchartsChartModule, FontAwesomeModule, MatTabsModule, MdbTabsModule, MatProgressSpinnerModule, NewsCardComponent, PortfolioCardsComponent],
     providers: [DatePipe]
 })
 export class StockDetailsComponent implements OnInit {
@@ -102,9 +115,24 @@ export class StockDetailsComponent implements OnInit {
     isPositive: boolean = false;
     showSuccessBanner: boolean = false;
 
-    constructor(private tickerService: TickerService, private apiService: ApiService, private newsOpenerModel: NgbModal) { }
+    //portfolio
+    private tradeStockAlert = new Subject<string>();
+    wishlistMessage = '';
+    tradeStockMessage = '';
+    alertTypeBuy!: 'buy' | 'sell';
+    holdingQuantity: number = 0;
+    currentMoney = 0;
+    isHolding: boolean = false;
+
+    constructor(public dialog: MatDialog,private tickerService: TickerService, private apiService: ApiService, private newsOpenerModel: NgbModal, private dataStorer: DataStorerService, private portfolioShow: PortfolioCardShowService) { 
+        this.calculateCurrentMoney();
+    }
 
     ngOnInit(): void {
+        this.tradeStockAlert.subscribe(message => {
+            this.tradeStockMessage = message;
+            setTimeout(() => this.tradeStockMessage = '', 5000);
+          });
         console.log("IM HEREEE")
         this.isLoading = true;
         console.log(this.isLoading);
@@ -155,6 +183,7 @@ export class StockDetailsComponent implements OnInit {
         this.createSurpriseChart();
         this.checkFavoriteStatus();
         this.checkMarketClose();
+        this.fetchCurrentStocks();
         setTimeout(() => {
             this.isLoading = false;
         }, 10);
@@ -489,4 +518,48 @@ export class StockDetailsComponent implements OnInit {
         const newsOpenerMod = this.newsOpenerModel.open(NewsCardComponent);
         newsOpenerMod.componentInstance.news = newsItem;
     }
+
+    portfolioDisplay(sell: boolean) {
+        let tradeDialogRef = this.dialog.open(PortfolioCardsComponent, {
+          width: '400px',
+          data: { 
+            tickerSymbol: this.ticker,
+            stockName: this.companyName, 
+            purchase: sell,
+            ownedQuantity: this.holdingQuantity,
+            marketPrice: this.lastPrice,
+            money: this.currentMoney
+           }
+        });
+  
+    
+        tradeDialogRef.afterClosed().subscribe((result: any) => {
+          console.log('The dialog was closed. Fetching updates.');
+          this.updateFinancialData();
+          if (result && result.success) {
+            if (result.action === 'bought') {
+              this.tradeStockAlert.next(this.ticker + " bought Successfully");
+              this.alertTypeBuy = 'buy'; // Set your alert type for styling if needed
+            } else if (result.action === 'sold') {
+              this.tradeStockAlert.next(this.ticker + " sold Successfully");
+              this.alertTypeBuy = 'sell'; // Set your alert type for styling if needed
+            }
+          }
+        });
+      }
+      fetchCurrentStocks() {
+        this.apiService.getHoldings().subscribe(holdings => {
+          const holdingsArray = holdings as HoldingData[];
+          this.isHolding = holdingsArray.some(holding => holding.ticker === this.ticker);
+          this.holdingQuantity = holdingsArray.find(holding => holding.ticker === this.ticker)?.quantity || 0;
+        })
+      }
+      private calculateCurrentMoney(): void {
+        // Logic to update current money
+        this.currentMoney = this.dataStorer.getCurrentMoney();
+      }
+      private updateFinancialData(): void {
+        this.fetchCurrentStocks();
+        this.calculateCurrentMoney();
+      }
 }

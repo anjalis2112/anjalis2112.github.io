@@ -18,6 +18,12 @@
                             style="margin-left: -10px;"></span>
                     </button>
                 </div>
+                <div *ngIf="tradeStockMessage">
+                    <div  [ngClass]="{'alert-success': alertTypeBuy === 'buy', 'alert-danger': alertTypeBuy === 'sell'}" class="alert">
+                        {{ tradeStockMessage }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>  
+                    </div>
                 <div class="row">
                     <!-- Left Side Column -->
                     <div class="col-md-4" *ngIf="ticker && companyName"> <!-- Adjust margin-bottom as needed -->
@@ -35,6 +41,10 @@
                             </h1>
                             <h2 style="margin-bottom: 3px;">{{ companyName }}</h2>
                             <p class="small" style="margin-bottom: 5px;">{{ exchangeCode }}</p>
+                            <div class="mt-2">
+                                <button (click)="portfolioDisplay(true)" class="btn btn-success shadow-none btn-no-caps " style="margin-right:3px;">Buy</button>
+                                <button (click)="portfolioDisplay(false)" *ngIf="isHolding" class="btn btn-danger shadow-none btn-no-caps">Sell</button>
+                            </div>
                         </div>
                     </div>
 

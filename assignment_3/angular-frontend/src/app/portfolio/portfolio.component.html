@@ -1,1 +1,90 @@
-<p>portfolio works!</p>
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8 col-lg-8">
+          <h1 class="watchlist-header">My Portfolio</h1>
+          <p class="text-secondary">Money in Wallet: ${{currentMoney  | number:'1.2-2'}}</p>
+      </div>
+  </div>
+    <div class="d-flex justify-content-center" *ngIf="isLoading">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+    <div class="row justify-content-center" *ngIf="!isLoading"> <!-- Ensure each card is a row of its own -->
+      <div *ngIf="tradeStockMessage">
+        <div  [ngClass]="{'alert-success': alertTypeBuy === 'buy', 'alert-danger': alertTypeBuy === 'sell'}" class="alert">
+            {{ tradeStockMessage }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>  
+        </div>
+      <div class="col-12 col-md-8 col-lg-8 mb-4" *ngFor="let stock of holdings; let i=index;"> <!-- Full width card and margin bottom -->
+        <div class="card">
+          <div class="card-header bg-light text-black">
+            <span style="font-size: 20px;">{{ stock.ticker }} </span>{{ stockData[i].name }}
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-12 col-md-6"> 
+                <p><span class="key" style="display: inline-block; min-width: 200px;">Quantity:</span><span class="value"><strong>{{ stock.quantity }}</strong></span></p>
+                <p><span class="key" style="display: inline-block; min-width: 200px;">Avg. Cost / Share:</span><span class="value"><strong>{{ (stock.cost)/(stock.quantity) | number:'1.2-2' }}</strong></span></p>
+                <p><span class="key" style="display: inline-block; min-width: 200px;">Total Cost:</span><span class="value"><strong>{{ stock.cost | number:'1.2-2' }}</strong></span></p>
+                <!-- Stack on small screens, half-width on medium screens -->
+                <!-- Stock info -->
+              </div>
+              <div class="col-12 col-md-6"> <!-- Stack on small screens, half-width on medium screens -->
+                <p *ngIf="isGreaterThanZero(stock.cost, stock.quantity, holdingQuote[i].c)">
+                  <span class="key" style="display: inline-block; min-width: 200px;">Change:</span>
+                  <span class="value success">{{ ((stock.cost/stock.quantity) - holdingQuote[i].c) | number:'1.0-2' }}</span>
+                </p>
+                <p *ngIf="isGreaterThanZero(stock.cost, stock.quantity, holdingQuote[i].c)">
+                  <span class="key" style="display: inline-block; min-width: 200px;">Current Price:</span>
+                  <span class="value success">{{ holdingQuote[i].c | number:'1.0-2' }}</span>
+                </p>
+                <p *ngIf="isGreaterThanZero(stock.cost, stock.quantity, holdingQuote[i].c)">
+                  <span class="key" style="display: inline-block; min-width: 200px;">Market Value:</span>
+                  <span class="value success">{{ holdingQuote[i].c * stock.quantity | number:'1.0-2' }}</span>
+                </p>
+                
+                
+                <p *ngIf="isLessThanZero(stock.cost, stock.quantity, holdingQuote[i].c)">
+                  <span class="key" style="display: inline-block; min-width: 200px;">Change:</span>
+                  <span class="value danger">{{ ((stock.cost/stock.quantity) - holdingQuote[i].c) | number:'1.0-2' }}</span>
+                </p>
+                <p *ngIf="isLessThanZero(stock.cost, stock.quantity, holdingQuote[i].c)">
+                  <span class="key" style="display: inline-block; min-width: 200px;">Current Price:</span>
+                  <span class="value danger">{{ holdingQuote[i].c | number:'1.0-2' }}</span>
+                </p>
+                <p *ngIf="isLessThanZero(stock.cost, stock.quantity, holdingQuote[i].c)">
+                  <span class="key" style="display: inline-block; min-width: 200px;">Market Value:</span>
+                  <span class="value danger">{{ holdingQuote[i].c * stock.quantity | number:'1.0-2' }}</span>
+                </p>
+  
+                <p *ngIf="isEqualToZero(stock.cost, stock.quantity, holdingQuote[i].c)">
+                  <span class="key"  style="display: inline-block; min-width: 200px;">Change:</span>
+                  <span class="value">{{ ((stock.cost/stock.quantity) - holdingQuote[i].c) | number:'1.0-2' }}</span>
+                </p>
+                <p *ngIf="isEqualToZero(stock.cost, stock.quantity, holdingQuote[i].c)">
+                  <span class="key"  style="display: inline-block; min-width: 200px;">Current Price:</span>
+                  <span class="value">{{ holdingQuote[i].c | number:'1.0-2' }}</span>
+                </p>
+                <p *ngIf="isEqualToZero(stock.cost, stock.quantity, holdingQuote[i].c)">
+                  <span class="key"  style="display: inline-block; min-width: 200px;">Market Value:</span>
+                  <span class="value">{{ holdingQuote[i].c * stock.quantity | number:'1.0-2' }}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer bg-light">
+            <button (click)="stockModal(true, stock.ticker,stockData[i].name,holdingQuote[i].c,stock.quantity,currentMoney)" class="btn btn-success">Buy</button>
+            <button (click)="stockModal(false, stock.ticker,stockData[i].name,holdingQuote[i].c,stock.quantity,currentMoney)" class="btn btn-danger">Sell</button>          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="holdings.length == 0">
+      <div class="row justify-content-center">
+        <div class="alert alert-warning text-dark text-center col-sm-10 col-md-8 col-lg-6" role="alert">
+            Currently you don't have any stock.
+        </div>
+    </div>
+      <!-- <p class="text-center no-holding p-2">Currently you don't have any stock.</p> -->
+  </div>
+  </div>
+  
