@@ -21,7 +21,7 @@ import { ElementRef } from '@angular/core';
     FormsModule,
     MatProgressSpinnerModule,
     ReactiveFormsModule,
-    StockDetailsComponent
+    StockDetailsComponent,
   ],
   templateUrl: './search-bar.component.html',
   styleUrls: ['./search-bar.component.css']
@@ -30,11 +30,13 @@ export class SearchBarComponent implements OnInit {
   isLoading = false;
   autoLoading: boolean = false;
   results: any = null;
+  lastQuery: string = '';
   queryField: FormControl = new FormControl();
   ticker: string | undefined;
   data: any;
   @ViewChild('searchForm')
   searchForm!: NgForm;
+  isFound: boolean = true;
 
   constructor(private router: Router, private apiService: ApiService, public tickerService: TickerService, private elementRef: ElementRef) { }
 
@@ -43,6 +45,10 @@ export class SearchBarComponent implements OnInit {
     this.queryField.valueChanges.pipe(
       debounceTime(500)
     ).subscribe((query: string) => {
+      if (query !== this.lastQuery) {
+        this.results = null; // Clear previous search results
+        this.lastQuery = query; // Update last query
+      }
       if (!query) {
         this.results = null;
         return;
@@ -51,10 +57,20 @@ export class SearchBarComponent implements OnInit {
       this.getResults(query.trim()).subscribe(
         (data: any) => {
           this.isLoading = false;
+          console.log(this.isFound);
           this.results = data.result;
+          console.log(this.results.length);
+          if(this.results.length > 0){
+            console.log("test isfound");
+            this.isFound = true;
+            console.log(this.isFound);
+          }
+          else {
+            this.isFound = false;
+          }
         },
         () => {
-          this.isLoading = false;
+        
           this.results = null;
         }
       );
@@ -85,6 +101,8 @@ export class SearchBarComponent implements OnInit {
   }
 
   clearTicker() {
+    this.results = null;
+    this.isFound = true;
     this.ticker = ''; // Set ticker to an empty string
     this.queryField.setValue(''); // Clear the FormControl value
     // Clear the input field by directly manipulating its DOM element

@@ -1,0 +1,27 @@
+.custom-navbar {
+    margin-left: 20px;
+}
+
+.custom-buttons {
+    margin-right: 20px;
+}
+
+.navbar-nav .nav-link {
+    margin-right: 10px;
+    padding: 8px 18px; 
+    border: 1px solid transparent; 
+    border-radius: 50px; 
+    color: grey;
+}
+
+.navbar-nav .nav-link:hover {
+    color: lightgrey; 
+}
+.custom-navbar .btn {
+    border: 1px solid white; /* Add border to the button */
+}
+
+.navbar-nav .nav-link.active {
+    border-color: white;
+    color: lightgrey; 
+}

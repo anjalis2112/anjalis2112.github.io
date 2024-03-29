@@ -25,4 +25,7 @@ export class NavbarComponent {
     onPortfolioClick() {
       this.router.navigate(['/portfolio']);
     }
+    isActive(route: string): boolean {
+      return this.router.url === route;
+    }
 }

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NavbarComponent } from './navbar/navbar.component';
+import { FinnhubFooterComponent } from './finnhub-footer/finnhub-footer.component';
 import { RouterOutlet } from '@angular/router';
-
 
 @Component({
   selector: 'app-root',
@@ -10,7 +10,8 @@ import { RouterOutlet } from '@angular/router';
   standalone: true,
   imports: [
     NavbarComponent,
-    RouterOutlet
+    RouterOutlet,
+    FinnhubFooterComponent
   ],
 
 })

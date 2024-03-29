@@ -14,6 +14,7 @@ import indicators from 'highcharts/indicators/indicators';
 import vbp from 'highcharts/indicators/volume-by-price';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MdbTabsModule } from 'mdb-angular-ui-kit/tabs';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 indicators(Highcharts);
 vbp(Highcharts);
@@ -36,7 +37,7 @@ interface NewsList {
     selector: 'app-stock-details',
     templateUrl: './stock-details.component.html',
     styleUrls: ['./stock-details.component.css'],
-    imports: [CommonModule, RouterModule, HttpClientModule, NgbModule, HighchartsChartModule, FontAwesomeModule, MatTabsModule, MdbTabsModule],
+    imports: [CommonModule, RouterModule, HttpClientModule, NgbModule, HighchartsChartModule, FontAwesomeModule, MatTabsModule, MdbTabsModule, MatProgressSpinnerModule],
     providers: [DatePipe]
 })
 export class StockDetailsComponent implements OnInit {
@@ -92,12 +93,15 @@ export class StockDetailsComponent implements OnInit {
     surpriseOptions: Highcharts.Options = {};
 
     isFavorite: boolean = false;
+    isLoading: boolean = false;
+    isPositive: boolean = false;
 
     constructor(private tickerService: TickerService, private apiService: ApiService) { }
 
     ngOnInit(): void {
         console.log("IM HEREEE")
-        
+        this.isLoading = true;
+        console.log(this.isLoading);
         this.tickerService.ticker$.subscribe(ticker => {
             this.ticker = ticker;
             this.tickerService.fetchData().subscribe(() => {
@@ -105,7 +109,9 @@ export class StockDetailsComponent implements OnInit {
             });
         });
 
-        this.checkMarketClose();
+        
+        
+        console.log(this.isLoading);
     }
 
     private setValues() {
@@ -142,6 +148,10 @@ export class StockDetailsComponent implements OnInit {
         this.createRecommendChart();
         this.createSurpriseChart();
         this.checkFavoriteStatus();
+        this.checkMarketClose();
+        setTimeout(() => {
+            this.isLoading = false;
+        }, 10);
 
     }
 

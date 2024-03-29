@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { SearchBarComponent } from './search-bar/search-bar.component';
-import { StockDetailsComponent } from './stock-details/stock-details.component';
+import { WatchlistComponent } from './watchlist/watchlist.component';
 
 export const routes: Routes = [
     {
@@ -20,6 +20,10 @@ export const routes: Routes = [
     {
         path: 'search/:ticker',
         component: SearchBarComponent
+    },
+    {
+        path: 'watchlist',
+        component: WatchlistComponent
     }
 ];
 export default routes;

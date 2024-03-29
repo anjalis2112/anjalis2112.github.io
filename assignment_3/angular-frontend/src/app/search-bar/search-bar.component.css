@@ -1,0 +1,26 @@
+.form-control {
+    margin-left: 10px;
+}
+
+.input-group>.form-control:focus,
+.input-group>.form-control:not(:disabled):not([readonly]):focus {
+    border-color: none;
+    box-shadow: none;
+}
+
+.no-hover:hover {
+    background-color: transparent;
+}
+
+.no-hover:focus {
+    background-color: transparent;
+}
+
+.autocomplete-result {
+    font-size: 13px; /* Adjust the font size as needed */
+}
+
+.alert {
+    color: black;
+    border: 1px solid red;
+}

@@ -1,23 +1,26 @@
+<div class="container text-center">
+    <div class="stock-search-name mt-5">
+        <h1>STOCK SEARCH</h1>
+    </div>
+</div>
 <form action="/action_page.php">
-    <div class="row justify-content-center mb-3 mt-3">
-        <div class="col-md-5 mt-4">
-            <div class="rounded-pill border border-2" style="--bs-border-color: #1d279d;">
+    <div class="row justify-content-center mb-3 ">
+        <div class="col-md-5">
+            <div class="rounded-pill border border-2" style="--mdb-border-color: #1d279d;">
                 <div class="input-group">
-
-
-                    <input type="text" class="form-control form-control-sm border-0 no-outline" [(ngModel)]="ticker"
-                        [matAutocomplete]="auto" [formControl]="queryField" placeholder="Enter stock ticker symbol">
+                    <input type="text" class="form-control form-control-sm border-0 no-outline ml-5 mt-1"
+                        [(ngModel)]="ticker" [matAutocomplete]="auto" [formControl]="queryField"
+                        placeholder="Enter stock ticker symbol">
                     <mat-autocomplete #auto="matAutocomplete">
                         <mat-option *ngIf="isLoading">
-                            <mat-spinner diameter="50"></mat-spinner>
-                            ABE YAAR DIKH JA LAUDE
+                            <mat-spinner diameter="30"></mat-spinner>
                         </mat-option>
                         <mat-option *ngFor="let result of results" [value]="result" (click)="selectResult(result)">
-                            {{result.displaySymbol}} | {{result.description}}
+                            <span class="autocomplete-result"> {{result.displaySymbol}} | {{result.description}} </span>
                         </mat-option>
                     </mat-autocomplete>
-                    <button class="btn btn-outline-secondary" type="button" style="color: #1d279d; border: none;"
-                        (click)="searchStockData($event)">
+                    <button class="btn btn-outline-secondary no-hover" type="button"
+                        style="color: #1d279d; border: none;" (click)="searchStockData($event)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
                             class="bi bi-search" viewBox="0 0 16 16">
                             <path
@@ -25,8 +28,8 @@
                             </path>
                         </svg>
                     </button>
-                    <button class="btn btn-outline-secondary" type="button" style="color: #1d279d; border: none;"
-                        (click)="clearTicker()">
+                    <button class="btn btn-outline-secondary no-hover" type="button"
+                        style="color: #1d279d; border: none;" (click)="clearTicker()">
                         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
                             class="bi bi-x" viewBox="0 0 16 16">
                             <path
@@ -41,4 +44,9 @@
 </form>
 <div *ngIf="tickerService.ticker !== null && tickerService.ticker !== ''">
     <app-stock-details [ticker]="tickerService.ticker"></app-stock-details>
+</div>
+<div *ngIf="!isFound" class="container text-center mt-5">
+    <div class="alert alert-danger" role="alert">
+        No data found. Please enter a valid ticker.
+    </div>
 </div>
