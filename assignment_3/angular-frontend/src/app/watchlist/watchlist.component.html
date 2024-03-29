@@ -1,37 +1,50 @@
-<div class="container"> 
+<div class="container">
     <div class="row mt-5">
         <div class="col"></div>
         <div class="col-10">
-            <h1 class="watchlist-header">My Watchlist</h1>
-            <div class="container mt-5 d-flex justify-content-center" *ngIf="isLoading">
+            <h1>My Watchlist</h1>
+            <div *ngIf="isLoading">
                 <mat-spinner diameter="50"></mat-spinner>
             </div>
-            <div class="container mt-4" *ngIf="!isLoading">
+            <div *ngIf="!isLoading && favorites.length > 0">
                 <div class="row" *ngFor="let stock of favorites; let i=index">
-                    <div class="col-11 mb-2 p-0">
-                        <div class="card shadow-none">
-                            <button type="button" class="btn-close justify-content-center mt-2 ms-2 pt-0" aria-label="Close" (click)="removeFromFavorites(stock.ticker)">
-                                <!-- <i class="fa-solid fa-xmark fa-2xs"></i> -->
-                                <i class="bi bi-x"></i>
-                            </button>
-                            <div class="card-body pt-1">
+                    <div class="col-12">
+                        <div class="card border mb-3">
+                            <div class="card-body pt-2">
                                 <div class="row">
                                     <div class="col">
-                                        <div class="row">
-                                            <h1 class="m-0">{{stock.ticker}}</h1>
+                                        <div class="row mb-1 ml-5 mt-0 pl-2">
+                                            <button class="btn-sm no-border d-flex align-items-center p-0"
+                                                (click)="removeFromFavorites(stock.ticker)">
+                                                <i class="fa fa-times fa-sm" aria-hidden="true"
+                                                    style="color: darkgray; font-size: 12px;"></i>
+                                            </button>
                                         </div>
-                                        <div class="row">
-                                            <h3 class="m-0 font-weight-normal text-thicker">{{stock.name}}</h3>
+                                        <div class="row mb-0 p-0">
+                                            <h1 class="mb-0 p-0 mt-1">{{stock.ticker}}</h1>
+                                        </div>
+                                        <div class="row mb-0 p-0">
+                                            <h3 class="mb-0 p-0">{{stock.name}}</h3>
                                         </div>
                                     </div>
-                                    <div class="col">
+                                    <div class="col mt-4">
                                         <div class="row">
-                                            <h1 class="m-0 font-weight-normal text-thicker increase" *ngIf="quoteDetails[i].d > 0">{{quoteDetails[i].c}}</h1>
-                                            <h1 class="m-0 font-weight-normal text-thicker decrease" *ngIf="quoteDetails[i].d <= 0">{{quoteDetails[i].c}}</h1>
-                                        </div>
-                                        <div class="row">
-                                            <h3 class="m-0 font-weight-normal text-thicker increase" *ngIf="quoteDetails[i].d > 0">▲ {{quoteDetails[i].d}} ({{quoteDetails[i].dp}}%)</h3>
-                                            <h3 class="m-0 font-weight-normal text-thicker decrease" *ngIf="quoteDetails[i].d < 0">▼ {{quoteDetails[i].d}} ({{quoteDetails[i].dp}}%)</h3>
+                                            <h1 class="mb-0"
+                                                [ngClass]="{'text-success': quoteDetails[i].d > 0, 'text-danger': quoteDetails[i].d <= 0}">
+                                                {{quoteDetails[i].c}}</h1>
+
+                                            <div *ngIf="quoteDetails[i].d > 0" class="d-flex align-items-center">
+                                                <i class="fa fa-caret-up text-success mt-0 mr-2"
+                                                    style="font-size: 20px; margin-right: 5px;"></i>
+                                                <h3 class="mb-0 ml-5 text-success"> {{quoteDetails[i].d}}
+                                                    ({{quoteDetails[i].dp}}%)</h3>
+                                            </div>
+                                            <div *ngIf="quoteDetails[i].d <= 0" class="d-flex align-items-center">
+                                                <i class="fa fa-caret-down text-danger mt-0"
+                                                    style="font-size: 20px; margin-right: 5px;"></i>
+                                                <h3 class="mb-0 ml-5 text-danger">{{quoteDetails[i].d}}
+                                                    ({{quoteDetails[i].dp}}%)</h3>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -39,10 +52,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="container mt-4 p-0" *ngIf="favorites.length == 0">
-                    <div class="row">
-                        <div class="col p-0">
-                            <p class="text-center no-watchlist p-2">Currently you don't have any stock in your watchlist.</p>
+            </div>
+            <div class="container mt-4 p-0" *ngIf="favorites.length == 0">
+                <div class="row">
+                    <div class="col p-0">
+                        <div class="alert alert-warning text-center" role="alert" style="border: 1px solid #c79b00; color: black;">
+                            Currently you don't have any stock.
                         </div>
                     </div>
                 </div>

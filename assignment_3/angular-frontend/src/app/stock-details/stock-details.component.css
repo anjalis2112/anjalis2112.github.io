@@ -1,5 +1,44 @@
 .no-border {
     border: none !important;
     background-color: white;
-    /* Use !important to override Bootstrap's default border */
 }
+
+.price-info h3 {
+    margin: 0rem 0;
+}
+
+.custom-card {
+    background-color: #f8f9fa;
+    border: 1px solid darkgray;
+    border-radius: 0px;
+    margin-top: 20px;
+}
+
+.custom-card .card-img-container {
+    padding: 10px;
+}
+
+.custom-card .card-img {
+    width: 150px;
+    height: 100px;
+}
+
+.custom-card .card-body {
+    padding: 15px;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+tr {
+    border-bottom: 1px solid darkgray;
+    margin-bottom: 20px; /* Adjust this value to increase or decrease the margin */
+}
+
+td, th {
+    padding: 10px; /* Add padding to cells for better spacing */
+}
+
+
+

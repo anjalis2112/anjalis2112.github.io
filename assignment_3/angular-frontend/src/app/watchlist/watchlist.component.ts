@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ApiService } from '../api.service';
 import { TickerService } from '../ticker.service';
@@ -14,6 +15,7 @@ import { catchError } from 'rxjs/operators';
     MatProgressSpinnerModule,
     NgIf,
     NgFor,
+    CommonModule
   ],
   templateUrl: './watchlist.component.html',
   styleUrl: './watchlist.component.css'

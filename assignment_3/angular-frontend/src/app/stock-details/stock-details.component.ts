@@ -15,6 +15,8 @@ import vbp from 'highcharts/indicators/volume-by-price';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MdbTabsModule } from 'mdb-angular-ui-kit/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { NewsCardComponent } from '../newscard/newscard.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 indicators(Highcharts);
 vbp(Highcharts);
@@ -26,6 +28,9 @@ interface News {
     description: any;
     url: any;
     image: any;
+    datetime: any;
+    headline: any;
+    summary: any;
 }
 
 interface NewsList {
@@ -37,7 +42,7 @@ interface NewsList {
     selector: 'app-stock-details',
     templateUrl: './stock-details.component.html',
     styleUrls: ['./stock-details.component.css'],
-    imports: [CommonModule, RouterModule, HttpClientModule, NgbModule, HighchartsChartModule, FontAwesomeModule, MatTabsModule, MdbTabsModule, MatProgressSpinnerModule],
+    imports: [CommonModule, RouterModule, HttpClientModule, NgbModule, HighchartsChartModule, FontAwesomeModule, MatTabsModule, MdbTabsModule, MatProgressSpinnerModule, NewsCardComponent],
     providers: [DatePipe]
 })
 export class StockDetailsComponent implements OnInit {
@@ -95,8 +100,9 @@ export class StockDetailsComponent implements OnInit {
     isFavorite: boolean = false;
     isLoading: boolean = false;
     isPositive: boolean = false;
+    showSuccessBanner: boolean = false;
 
-    constructor(private tickerService: TickerService, private apiService: ApiService) { }
+    constructor(private tickerService: TickerService, private apiService: ApiService, private newsOpenerModel: NgbModal) { }
 
     ngOnInit(): void {
         console.log("IM HEREEE")
@@ -109,8 +115,8 @@ export class StockDetailsComponent implements OnInit {
             });
         });
 
-        
-        
+
+
         console.log(this.isLoading);
     }
 
@@ -214,7 +220,7 @@ export class StockDetailsComponent implements OnInit {
             const currentTime = new Date().getTime();
             const difference = (currentTime - this.timestamp.getTime()) / (1000 * 60); // Difference in minutes
             this.marketClosed = difference >= 5; // Set marketClosed flag based on difference
-          }, 1000);
+        }, 1000);
     }
 
     createChartTab() {
@@ -459,13 +465,28 @@ export class StockDetailsComponent implements OnInit {
 
     checkFavoriteStatus() {
         this.apiService.getFavorites().subscribe(favorites => {
-          const favoritesArray = favorites as FavoriteData[];
-          this.isFavorite = favoritesArray.some(favorite => favorite.ticker === this.ticker);
+            const favoritesArray = favorites as FavoriteData[];
+            this.isFavorite = favoritesArray.some(favorite => favorite.ticker === this.ticker);
         });
-      }
-      updateFavorites(ticker: string, name?: string) {
+    }
+    updateFavorites(ticker: string, name?: string) {
         this.apiService.updateFavorites(ticker, name).subscribe(data => {
         });
         this.isFavorite = !this.isFavorite;
-      }
+        if (this.isFavorite) {
+            this.showSuccessBanner = true;
+        }
+        else {
+            this.showSuccessBanner = false;
+        }
+    }
+
+    dismissSuccessBanner() {
+        this.showSuccessBanner = false;
+    }
+
+    openNewsCard(newsItem: News) {
+        const newsOpenerMod = this.newsOpenerModel.open(NewsCardComponent);
+        newsOpenerMod.componentInstance.news = newsItem;
+    }
 }

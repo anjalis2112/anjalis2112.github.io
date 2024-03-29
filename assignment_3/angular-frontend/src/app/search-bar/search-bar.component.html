@@ -42,7 +42,7 @@
         </div>
     </div>
 </form>
-<div *ngIf="tickerService.ticker !== null && tickerService.ticker !== ''">
+<div *ngIf="(tickerService.ticker !== null && tickerService.ticker !== '')">
     <app-stock-details [ticker]="tickerService.ticker"></app-stock-details>
 </div>
 <div *ngIf="!isFound" class="container text-center mt-5">

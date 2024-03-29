@@ -10,6 +10,9 @@ interface News {
   description: any;
   url: any;
   image: any;
+  datetime: any;
+  headline: any;
+  summary: any;
 }
 
 interface NewsList {
@@ -114,8 +117,8 @@ export class TickerService {
       this.apiService.getPeersData(this.ticker),
       this.apiService.getEarningsData(this.ticker),
       this.apiService.getPeersData(this.ticker),
-      //this.apiService.getHistoricalData(this.ticker),
-      //this.apiService.getHourlyData(this.ticker)
+      // this.apiService.getHistoricalData(this.ticker),
+      // this.apiService.getHourlyData(this.ticker)
     ]).pipe(
       tap(([profileData, quoteData, newsData, insiderData, trendsData, earningsData, peersData, historicalData, hourlyData]) => {
         // Update properties with fetched data
@@ -144,7 +147,10 @@ export class TickerService {
             title: item.headline,
             description: item.summary,
             url: item.url,
-            image: item.image
+            image: item.image,
+            datetime: item.datetime,
+            headline: item.headline,
+            summary: item.summary
           }))
           .slice(0, 20); // Keep only the first 20 items
         const newsList: NewsList = { news: filteredNews };
