@@ -1,6 +1,6 @@
 import { Injectable, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { PortfolioCardsComponent } from './portfolio-cards/portfolio-cards.component';
+import { CustomPortfolioCardsComponent } from './portfolio-cards/custom-portfolio-cards.component';
 import { tap } from 'rxjs';
 import { DataStorerService } from './data-storer.service';
 import { ApiService } from './api.service';
@@ -44,7 +44,7 @@ export class PortfolioCardShowService {
           return;
         }
 
-    let tradeDialogRef = this.dialog.open(PortfolioCardsComponent, {
+    let tradeDialogRef = this.dialog.open(CustomPortfolioCardsComponent, {
       width: '400px',
       data: { 
         tickerSymbol: searchResult.profile.ticker, 
@@ -71,7 +71,7 @@ private updateFinancialData(): void {
 
 private calculateCurrentMoney(): void {
   // Logic to update current money
-  this.currentMoney = this.dataStorer.getCurrentMoney();
+  this.currentMoney = this.dataStorer.getCurrentFunds();
 }
 
 fetchCurrentStocks() {

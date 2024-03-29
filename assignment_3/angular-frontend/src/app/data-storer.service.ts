@@ -8,7 +8,7 @@ export class DataStorerService {
     return this.lastSearchArg;
   }
 
-  getCurrentMoney(): number {
+  getCurrentFunds(): number {
     return this.currentMoney;
   }
 
@@ -27,7 +27,7 @@ export class DataStorerService {
     this.lastSearchResult = null;
   }
 
-  setCurrentMoney(money: number): void {
+  setCurrentFunds(money: number): void {
     this.currentMoney = money;
   }
 

@@ -18,7 +18,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NewsCardComponent } from '../newscard/newscard.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
-import { PortfolioCardsComponent } from '../portfolio-cards/portfolio-cards.component';
+import { CustomPortfolioCardsComponent } from '../portfolio-cards/custom-portfolio-cards.component';
 import { PortfolioCardShowService } from '../portfolio-card-show.service';
 import { DataStorerService } from '../data-storer.service';
 import {MatDialogModule, MatDialog} from '@angular/material/dialog';
@@ -55,7 +55,7 @@ interface HoldingData {
     selector: 'app-stock-details',
     templateUrl: './stock-details.component.html',
     styleUrls: ['./stock-details.component.css'],
-    imports: [CommonModule, RouterModule,MatDialogModule, HttpClientModule, NgbModule, HighchartsChartModule, FontAwesomeModule, MatTabsModule, MdbTabsModule, MatProgressSpinnerModule, NewsCardComponent, PortfolioCardsComponent],
+    imports: [CommonModule, RouterModule,MatDialogModule, HttpClientModule, NgbModule, HighchartsChartModule, FontAwesomeModule, MatTabsModule, MdbTabsModule, MatProgressSpinnerModule, NewsCardComponent, CustomPortfolioCardsComponent],
     providers: [DatePipe]
 })
 export class StockDetailsComponent implements OnInit {
@@ -520,7 +520,7 @@ export class StockDetailsComponent implements OnInit {
     }
 
     portfolioDisplay(sell: boolean) {
-        let tradeDialogRef = this.dialog.open(PortfolioCardsComponent, {
+        let tradeDialogRef = this.dialog.open(CustomPortfolioCardsComponent, {
           width: '400px',
           data: { 
             tickerSymbol: this.ticker,
@@ -556,7 +556,7 @@ export class StockDetailsComponent implements OnInit {
       }
       private calculateCurrentMoney(): void {
         // Logic to update current money
-        this.currentMoney = this.dataStorer.getCurrentMoney();
+        this.currentMoney = this.dataStorer.getCurrentFunds();
       }
       private updateFinancialData(): void {
         this.fetchCurrentStocks();

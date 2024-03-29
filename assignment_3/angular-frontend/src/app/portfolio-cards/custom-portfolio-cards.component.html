@@ -1,0 +1,24 @@
+<div class="modal-header p-3">
+    <h3 class="modal-title">{{ companyName }}</h3>
+    <button type="button" class="close" aria-label="Close" (click)="onClose()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body p-4">
+    <p>Current Price: {{currentPrice}}</p>
+    <p>Money in Wallet: ${{ currentFunds.toFixed(2)}}</p>
+    <div class="form-group row">
+        <label for="quantityInput" class="col-sm-3 col-form-label">Quantity:</label>
+        <div class="col-sm-9">
+            <input type="number" id="quantityInput" class="form-control" [(ngModel)]="transactionAmount" (ngModelChange)="onAmountChange($event)" min="0">
+        </div>
+    </div>
+    <span *ngIf="insufficientFunds && isPurchase" class="text-danger">Not enough money in wallet!</span>
+    <span *ngIf="insufficientStocks && !isPurchase" class="text-danger">You cannot sell more stocks than you own!</span>
+</div>
+<div class="modal-footer p-2">
+    <p>Total: ${{ totalTransactionCost | number:'1.2-2' }}</p>
+    <button type="button" class="btn btn-success" (click)="onTransaction()" [disabled]="isPurchase ? currentFunds < totalTransactionCost : transactionAmount > availableStocks">
+        {{ isPurchase ? 'Buy' : 'Sell' }}
+    </button>
+</div>

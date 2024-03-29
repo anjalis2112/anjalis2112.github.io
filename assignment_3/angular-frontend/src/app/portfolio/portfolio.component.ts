@@ -7,10 +7,9 @@ import { catchError, tap } from 'rxjs/operators';
 import { DataStorerService } from '../data-storer.service';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// import { OpenStockModalService } from '../../services/open-stock-modal.service';
 import { MatDialog } from '@angular/material/dialog';
 import { PortfolioCardShowService } from '../portfolio-card-show.service';
-import { PortfolioCardsComponent } from '../portfolio-cards/portfolio-cards.component';
+import { CustomPortfolioCardsComponent } from '../portfolio-cards/custom-portfolio-cards.component';
 
 interface QuoteData {
   c: number;
@@ -41,7 +40,7 @@ interface StockName {
     MatProgressSpinnerModule,
     NgIf,
     NgFor,
-    CommonModule
+    CommonModule,
   ],
   templateUrl: './portfolio.component.html',
   styleUrl: './portfolio.component.css'
@@ -75,7 +74,7 @@ export class PortfolioComponent {
       setTimeout(() => this.tradeStockMessage = '', 5000);
     });
     this.fetchHoldings();
-    this.currentMoney = this.dataStorer.getCurrentMoney();
+    this.currentMoney = this.dataStorer.getCurrentFunds();
     this.subscription = this.showPortfolioCard.searchResult$.subscribe(result => {
       this.searchResult = result;
     });
@@ -157,7 +156,7 @@ export class PortfolioComponent {
   stockModal(toBuy: boolean, ticker: string, stockName: string, currentPrice: number, quantity: number, money: number) {
     console.log("Money: " + money + "ticker: " + ticker + "stockName: " + stockName + "currPrice: " + currentPrice + "q: " + quantity );
     this.ticker = ticker;
-    const dialogVar = this.dialog.open(PortfolioCardsComponent, {
+    const dialogVar = this.dialog.open(CustomPortfolioCardsComponent, {
       width: '400px',
       data: { 
         tickerSymbol: ticker,
@@ -174,7 +173,7 @@ export class PortfolioComponent {
       this.holdings = [];
       this.holdingQuote = [];
       this.fetchHoldings();
-      this.currentMoney = this.dataStorer.getCurrentMoney();
+      this.currentMoney = this.dataStorer.getCurrentFunds();
 
       if (result && result.success) {
         if (result.action === 'bought') {
