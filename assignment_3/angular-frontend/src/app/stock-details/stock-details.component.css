@@ -40,5 +40,11 @@ td, th {
     padding: 10px; /* Add padding to cells for better spacing */
 }
 
+.chart-container {
+    width: 100%; /* Set width to 100% of viewport width */
+    height: 100vh; /* Set height to 100% of viewport height */
+    /* overflow: hidden; Ensure chart does not overflow its container */
+}
+
 
 

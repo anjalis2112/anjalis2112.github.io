@@ -4,6 +4,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { faXTwitter, faFacebook} from '@fortawesome/free-brands-svg-icons';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { TickerService } from '../ticker.service';
 
 interface News {
   source: any;
@@ -15,10 +16,6 @@ interface News {
   datetime: any;
   headline: any;
   summary: any;
-}
-
-interface NewsList {
-  news: News[];
 }
 
 @Component({
@@ -33,11 +30,12 @@ export class NewsCardComponent {
   icon1 = faXTwitter;
   icon2 = faFacebook;
 
-  constructor(public activeModal: NgbActiveModal, library: FaIconLibrary){
+  constructor(public activeModal: NgbActiveModal, library: FaIconLibrary, private tickerService: TickerService){
     library.addIcons(faXTwitter);
   }
 
   closeModal() {
+    console.log(this.tickerService.changePercent);
     this.activeModal.dismiss();
   }
 

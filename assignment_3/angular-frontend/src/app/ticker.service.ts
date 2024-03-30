@@ -79,18 +79,12 @@ export class TickerService {
   ticker$ = this.tickerSubject.asObservable();
 
   constructor(private apiService: ApiService) {
-    // Fetch data when service is instantiated
-    this.ticker$.subscribe(ticker => {
-      if (ticker) {
-        this.fetchData().subscribe(() => {
-          // Data fetched, perform any additional actions if needed
-        });
-      }
-    });
   }
 
   setTicker(ticker: string) {
+    this.ticker = ticker; // Set the ticker property
     this.tickerSubject.next(ticker);
+    console.log('Ticker set:', ticker);
   }
 
   clearTicker() {
@@ -115,10 +109,8 @@ export class TickerService {
       this.apiService.getTrendsData(this.ticker),
       this.apiService.getEarningsData(this.ticker),
       this.apiService.getPeersData(this.ticker),
-      this.apiService.getEarningsData(this.ticker),
-      this.apiService.getPeersData(this.ticker),
-      // this.apiService.getHistoricalData(this.ticker),
-      // this.apiService.getHourlyData(this.ticker)
+      this.apiService.getHistoricalData(this.ticker),
+      this.apiService.getHourlyData(this.ticker)
     ]).pipe(
       tap(([profileData, quoteData, newsData, insiderData, trendsData, earningsData, peersData, historicalData, hourlyData]) => {
         // Update properties with fetched data

@@ -21,7 +21,7 @@ import { Subject } from 'rxjs';
 import { PortfolioCardsComponent } from '../portfolio-cards/portfolio-cards.component';
 import { PortfolioCardShowService } from '../portfolio-card-show.service';
 import { DataStorerService } from '../data-storer.service';
-import {MatDialogModule, MatDialog} from '@angular/material/dialog';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 
 indicators(Highcharts);
 vbp(Highcharts);
@@ -48,14 +48,14 @@ interface HoldingData {
     name: string;
     quantity: number;
     cost: number;
-  }
+}
 
 @Component({
     standalone: true,
     selector: 'app-stock-details',
     templateUrl: './stock-details.component.html',
     styleUrls: ['./stock-details.component.css'],
-    imports: [CommonModule, RouterModule,MatDialogModule, HttpClientModule, NgbModule, HighchartsChartModule, FontAwesomeModule, MatTabsModule, MdbTabsModule, MatProgressSpinnerModule, NewsCardComponent, PortfolioCardsComponent],
+    imports: [CommonModule, RouterModule, MatDialogModule, HttpClientModule, NgbModule, HighchartsChartModule, FontAwesomeModule, MatTabsModule, MdbTabsModule, MatProgressSpinnerModule, NewsCardComponent, PortfolioCardsComponent],
     providers: [DatePipe]
 })
 export class StockDetailsComponent implements OnInit {
@@ -86,7 +86,7 @@ export class StockDetailsComponent implements OnInit {
     positiveChange: any;
     negativeChange: any;
     view: string = '';
-    marketClosed: boolean = false;
+    marketClosed: boolean | null = null;
 
     //hourly chart data
     lineColor: any;
@@ -124,7 +124,7 @@ export class StockDetailsComponent implements OnInit {
     currentMoney = 0;
     isHolding: boolean = false;
 
-    constructor(public dialog: MatDialog,private tickerService: TickerService, private apiService: ApiService, private newsOpenerModel: NgbModal, private dataStorer: DataStorerService, private portfolioShow: PortfolioCardShowService) { 
+    constructor(public dialog: MatDialog, private tickerService: TickerService, private apiService: ApiService, private newsOpenerModel: NgbModal, private dataStorer: DataStorerService, private portfolioShow: PortfolioCardShowService) {
         this.calculateCurrentMoney();
     }
 
@@ -132,17 +132,23 @@ export class StockDetailsComponent implements OnInit {
         this.tradeStockAlert.subscribe(message => {
             this.tradeStockMessage = message;
             setTimeout(() => this.tradeStockMessage = '', 5000);
-          });
+        });
         console.log("IM HEREEE")
         this.isLoading = true;
         console.log(this.isLoading);
         this.tickerService.ticker$.subscribe(ticker => {
-            this.ticker = ticker;
+            this.ticker = ticker;    
+            console.log("INSIDE STOCK")
+            this.dataStorer.getLastSearchArg();
+            this.dataStorer.setLastSearchArg(this.ticker);
+            this.dataStorer.getLastSearchArg();
             this.tickerService.fetchData().subscribe(() => {
                 this.setValues();
             });
         });
-
+        if (this.timestamp) {
+            this.checkMarketClose();
+        }
 
 
         console.log(this.isLoading);
@@ -177,16 +183,16 @@ export class StockDetailsComponent implements OnInit {
         this.trendsData = this.tickerService.trendsData;
         this.surpriseData = this.tickerService.surpriseData;
 
+        this.checkMarketClose();
         this.createHourlyChart();
         this.createChartTab();
         this.createRecommendChart();
         this.createSurpriseChart();
         this.checkFavoriteStatus();
-        this.checkMarketClose();
         this.fetchCurrentStocks();
         setTimeout(() => {
             this.isLoading = false;
-        }, 10);
+        }, 30);
 
     }
 
@@ -245,6 +251,11 @@ export class StockDetailsComponent implements OnInit {
     }
 
     checkMarketClose() {
+        const currentTime = new Date().getTime();
+        const difference = (currentTime - this.timestamp.getTime()) / (1000 * 60); // Difference in minutes
+        this.marketClosed = difference >= 5; // Set marketClosed flag based on difference
+
+        console.log("CHECK MARKET CLOSE")
         setInterval(() => {
             const currentTime = new Date().getTime();
             const difference = (currentTime - this.timestamp.getTime()) / (1000 * 60); // Difference in minutes
@@ -521,45 +532,45 @@ export class StockDetailsComponent implements OnInit {
 
     portfolioDisplay(sell: boolean) {
         let tradeDialogRef = this.dialog.open(PortfolioCardsComponent, {
-          width: '400px',
-          data: { 
-            tickerSymbol: this.ticker,
-            stockName: this.companyName, 
-            purchase: sell,
-            ownedQuantity: this.holdingQuantity,
-            marketPrice: this.lastPrice,
-            money: this.currentMoney
-           }
-        });
-  
-    
-        tradeDialogRef.afterClosed().subscribe((result: any) => {
-          console.log('The dialog was closed. Fetching updates.');
-          this.updateFinancialData();
-          if (result && result.success) {
-            if (result.action === 'bought') {
-              this.tradeStockAlert.next(this.ticker + " bought Successfully");
-              this.alertTypeBuy = 'buy'; // Set your alert type for styling if needed
-            } else if (result.action === 'sold') {
-              this.tradeStockAlert.next(this.ticker + " sold Successfully");
-              this.alertTypeBuy = 'sell'; // Set your alert type for styling if needed
+            width: '400px',
+            data: {
+                tickerSymbol: this.ticker,
+                stockName: this.companyName,
+                purchase: sell,
+                ownedQuantity: this.holdingQuantity,
+                marketPrice: this.lastPrice,
+                money: this.currentMoney
             }
-          }
         });
-      }
-      fetchCurrentStocks() {
+
+
+        tradeDialogRef.afterClosed().subscribe((result: any) => {
+            console.log('The dialog was closed. Fetching updates.');
+            this.updateFinancialData();
+            if (result && result.success) {
+                if (result.action === 'bought') {
+                    this.tradeStockAlert.next(this.ticker + " bought Successfully");
+                    this.alertTypeBuy = 'buy'; // Set your alert type for styling if needed
+                } else if (result.action === 'sold') {
+                    this.tradeStockAlert.next(this.ticker + " sold Successfully");
+                    this.alertTypeBuy = 'sell'; // Set your alert type for styling if needed
+                }
+            }
+        });
+    }
+    fetchCurrentStocks() {
         this.apiService.getHoldings().subscribe(holdings => {
-          const holdingsArray = holdings as HoldingData[];
-          this.isHolding = holdingsArray.some(holding => holding.ticker === this.ticker);
-          this.holdingQuantity = holdingsArray.find(holding => holding.ticker === this.ticker)?.quantity || 0;
+            const holdingsArray = holdings as HoldingData[];
+            this.isHolding = holdingsArray.some(holding => holding.ticker === this.ticker);
+            this.holdingQuantity = holdingsArray.find(holding => holding.ticker === this.ticker)?.quantity || 0;
         })
-      }
-      private calculateCurrentMoney(): void {
+    }
+    private calculateCurrentMoney(): void {
         // Logic to update current money
         this.currentMoney = this.dataStorer.getCurrentMoney();
-      }
-      private updateFinancialData(): void {
+    }
+    private updateFinancialData(): void {
         this.fetchCurrentStocks();
         this.calculateCurrentMoney();
-      }
+    }
 }

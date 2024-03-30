@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ApiService } from '../api.service';
 import { TickerService } from '../ticker.service';
+import { Router } from '@angular/router';
 import { MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { NgIf, NgFor } from '@angular/common';
 import { FavoriteData } from '../favorite.interface';
@@ -15,7 +16,7 @@ import { catchError } from 'rxjs/operators';
     MatProgressSpinnerModule,
     NgIf,
     NgFor,
-    CommonModule
+    CommonModule,
   ],
   templateUrl: './watchlist.component.html',
   styleUrl: './watchlist.component.css'
@@ -26,6 +27,7 @@ export class WatchlistComponent {
   isLoading: boolean = false;
 
   constructor(
+    private router: Router,
     private apiService: ApiService,
     private tickerService: TickerService
     ) {}
@@ -76,5 +78,11 @@ export class WatchlistComponent {
     }, error => {
       console.log('Failed to remove favorite:', symbol, error);
     });
+  }
+
+  backToSearch(ticker: string): void {
+    console.log("BACK TO SEARCH TICKER: ", ticker);
+    this.tickerService.setTicker(ticker);
+    this.router.navigate(['/search', ticker]);
   }
 }

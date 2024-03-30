@@ -10,8 +10,8 @@ import { throwError } from 'rxjs';
 export class ApiService {
 
   private apiUrl = 'http://localhost:8080';
-  readonly favorites = this.apiUrl +'/favorites/'
-  readonly holdings = this.apiUrl +'/holdings/'
+  readonly favorites = this.apiUrl + '/favorites/'
+  readonly holdings = this.apiUrl + '/holdings/'
 
   constructor(private httpClient: HttpClient) { }
 
@@ -31,7 +31,6 @@ export class ApiService {
     return this.httpClient.get<any>(`${this.apiUrl}/auto/${ticker}`, { params });
   }
 
-  //TO USE FOR DESC 
   getProfileData(ticker: string, params?: HttpParams) {
     return this.httpClient.get<any>(`${this.apiUrl}/profile/${ticker}`, { params });
   }
@@ -40,21 +39,19 @@ export class ApiService {
     return this.httpClient.get<any>(`${this.apiUrl}/hourly/${ticker}`, { params });
   }
 
-  //TO USE
   getHistoricalData(ticker: string, params?: HttpParams) {
+    console.log('getHistoricalData');
     return this.httpClient.get<any>(`${this.apiUrl}/history/${ticker}`, { params });
   }
 
-  //LATEST QUOTE
   getQuoteData(ticker: string, params?: HttpParams) {
     return this.httpClient.get<any>(`${this.apiUrl}/quote/${ticker}`, { params });
   }
 
-  //TO USE
   getNewsData(ticker: string, params?: HttpParams) {
     return this.httpClient.get<any>(`${this.apiUrl}/news/${ticker}`, { params });
   }
-  
+
 
   getTrendsData(ticker: string, params?: HttpParams) {
     return this.httpClient.get<any>(`${this.apiUrl}/trends/${ticker}`, { params });
@@ -64,7 +61,6 @@ export class ApiService {
     return this.httpClient.get<any>(`${this.apiUrl}/insider/${ticker}`, { params });
   }
 
-  //TO USE
   getPeersData(ticker: string, params?: HttpParams) {
     return this.httpClient.get<any>(`${this.apiUrl}/peers/${ticker}`, { params });
   }
@@ -73,26 +69,26 @@ export class ApiService {
     return this.httpClient.get<any>(`${this.apiUrl}/earnings/${ticker}`, { params });
   }
 
-  getFavorites(){
+  getFavorites() {
     return this.httpClient.get(this.favorites)
       .pipe(
         catchError(this.handleError)
       );
   }
-  getHoldings(){
+  getHoldings() {
     return this.httpClient.get(this.holdings)
       .pipe(
         catchError(this.handleError)
       );
   }
-  updateFavorites(ticker: string, name?: string){
-    return this.httpClient.post(this.favorites, { ticker: ticker, name: name }) 
+  updateFavorites(ticker: string, name?: string) {
+    return this.httpClient.post(this.favorites, { ticker: ticker, name: name })
       .pipe(
         catchError(this.handleError)
       );
   }
-  updateHoldings(ticker: string, quantity: number, cost: number){
-    return this.httpClient.post(this.holdings, { ticker: ticker, quantity: quantity, cost: cost }) 
+  updateHoldings(ticker: string, quantity: number, cost: number) {
+    return this.httpClient.post(this.holdings, { ticker: ticker, quantity: quantity, cost: cost })
       .pipe(
         catchError(this.handleError)
       );

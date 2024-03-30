@@ -5,26 +5,26 @@ import { Injectable } from '@angular/core';
 })
 export class DataStorerService {
   getLastSearchArg(): string {
-    return this.lastSearchArg;
+    console.log('Inside get Last search arg:', this.prevSearch);
+    return this.prevSearch;
   }
 
   getCurrentMoney(): number {
     return this.currentMoney;
   }
 
-  private lastSearchArg: string = '';
-  private lastSearchResult: any;
+  private prevSearch: string = '';
   private currentMoney: number = 25000.00;
 
   constructor() { }
 
   setLastSearchArg(arg: string): void {
-    this.lastSearchArg = arg;
+    this.prevSearch = arg;
+    console.log('Last search arg set to:', this.prevSearch);
   }
 
   clearLastSearch(): void {
-    this.lastSearchArg = '';
-    this.lastSearchResult = null;
+    this.prevSearch = '';
   }
 
   setCurrentMoney(money: number): void {

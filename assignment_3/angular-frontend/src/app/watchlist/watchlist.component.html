@@ -9,7 +9,7 @@
             <div *ngIf="!isLoading && favorites.length > 0">
                 <div class="row" *ngFor="let stock of favorites; let i=index">
                     <div class="col-12">
-                        <div class="card border mb-3">
+                        <div class="card border mb-3" (click)="backToSearch(stock.ticker)">
                             <div class="card-body pt-2">
                                 <div class="row">
                                     <div class="col">
@@ -56,7 +56,8 @@
             <div class="container mt-4 p-0" *ngIf="favorites.length == 0">
                 <div class="row">
                     <div class="col p-0">
-                        <div class="alert alert-warning text-center" role="alert" style="border: 1px solid #c79b00; color: black;">
+                        <div class="alert alert-warning text-center" role="alert"
+                            style="border: 1px solid #c79b00; color: black;">
                             Currently you don't have any stock.
                         </div>
                     </div>

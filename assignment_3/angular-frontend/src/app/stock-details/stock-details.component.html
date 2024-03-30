@@ -19,11 +19,12 @@
                     </button>
                 </div>
                 <div *ngIf="tradeStockMessage">
-                    <div  [ngClass]="{'alert-success': alertTypeBuy === 'buy', 'alert-danger': alertTypeBuy === 'sell'}" class="alert">
+                    <div [ngClass]="{'alert-success': alertTypeBuy === 'buy', 'alert-danger': alertTypeBuy === 'sell'}"
+                        class="alert">
                         {{ tradeStockMessage }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                      </div>  
                     </div>
+                </div>
                 <div class="row">
                     <!-- Left Side Column -->
                     <div class="col-md-4" *ngIf="ticker && companyName"> <!-- Adjust margin-bottom as needed -->
@@ -42,8 +43,11 @@
                             <h2 style="margin-bottom: 3px;">{{ companyName }}</h2>
                             <p class="small" style="margin-bottom: 5px;">{{ exchangeCode }}</p>
                             <div class="mt-2">
-                                <button (click)="portfolioDisplay(true)" class="btn btn-success shadow-none btn-no-caps " style="margin-right:3px;">Buy</button>
-                                <button (click)="portfolioDisplay(false)" *ngIf="isHolding" class="btn btn-danger shadow-none btn-no-caps">Sell</button>
+                                <button (click)="portfolioDisplay(true)"
+                                    class="btn btn-success shadow-none btn-no-caps "
+                                    style="margin-right:3px;">Buy</button>
+                                <button (click)="portfolioDisplay(false)" *ngIf="isHolding"
+                                    class="btn btn-danger shadow-none btn-no-caps">Sell</button>
                             </div>
                         </div>
                     </div>
@@ -98,19 +102,20 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="ml-3"> <!-- Add left margin -->
-                                            <div class="price-info">
+                                            <div class="price-info col-6 text-center mt-4">
                                                 <h3><strong>High Price:</strong> {{ highPrice }}</h3>
                                                 <h3><strong>Low Price:</strong> {{ lowPrice }}</h3>
                                                 <h3><strong>Open Price:</strong> {{ openPrice }}</h3>
                                                 <h3><strong>Prev. Close:</strong> {{ prevClosePrice }}</h3>
                                             </div>
                                         </div>
-                                        <div class="ml-5"> <!-- Add bigger left margin -->
+                                        <div class="col-12 text-center mt-3 mb-5"> <!-- Add bigger left margin -->
                                             <div class="company-deets">
                                                 <h3><strong><u>About the Company:</u></strong></h3>
                                                 <p><strong>IPO Start Date:</strong> {{ ipoStartDate }}</p>
                                                 <p><strong>Industry:</strong> {{ industry }}</p>
-                                                <p><strong>Webpage:</strong> <a [href]="webpage" target="_blank">{{ webpage }}</a></p>
+                                                <p><strong>Webpage:</strong> <a [href]="webpage" target="_blank">{{
+                                                        webpage }}</a></p>
                                                 <p><strong>Company Peers:</strong></p>
                                                 <p>{{ companyPeers }}</p>
                                             </div>
@@ -127,7 +132,7 @@
                                 </div>
                             </div>
                         </mat-tab>
-                        
+
                         <mat-tab label="Top News">
                             <div class="container-fluid">
                                 <div class="row">
@@ -153,22 +158,16 @@
                             </div>
                         </mat-tab>
 
-
                         <mat-tab label="Charts">
-                            <div class="container-fluid"> <!-- Ensuring the container spans the entire width -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div style="height: 600px;"> <!-- Adjust height as needed -->
-                                            <highcharts-chart [Highcharts]="chartTab" [options]="chartTabOptions"
-                                                [constructorType]="chartTabConstructor"
-                                                style="width: 100%; height: 100%;">
-                                            </highcharts-chart>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="mt-5 mb-5">
+                            <highcharts-chart [Highcharts]="chartTab" [options]="chartTabOptions"
+                                [constructorType]="chartTabConstructor"
+                                style="width: 100%; height: 100%; display:block">
+                            </highcharts-chart>
                             </div>
                         </mat-tab>
-                        
+
+
                         <mat-tab label="Insights">
                             <div class="row">
                                 <div class="col-md-3"></div>
@@ -199,7 +198,7 @@
                                 </div>
                                 <div class="col-md-3"></div>
                             </div>
-                            <div class="row mt-3">
+                            <div class="row mt-3 mb-5">
                                 <div class="col-md-6">
                                     <highcharts-chart [Highcharts]="recommendCharts" [options]="recommendOptions"
                                         style="width: 100%; height: 325px; display: block;">

@@ -12,6 +12,7 @@
     border: 1px solid transparent; 
     border-radius: 50px; 
     color: grey;
+    cursor: pointer;
 }
 
 .navbar-nav .nav-link:hover {

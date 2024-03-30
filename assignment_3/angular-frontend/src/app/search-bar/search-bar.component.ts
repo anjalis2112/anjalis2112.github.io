@@ -10,6 +10,7 @@ import { Observable, of } from 'rxjs';
 import { TickerService } from '../ticker.service';
 import { StockDetailsComponent } from '../stock-details/stock-details.component';
 import { ElementRef } from '@angular/core';
+import { DataStorerService } from '../data-storer.service';
 
 
 
@@ -38,7 +39,7 @@ export class SearchBarComponent implements OnInit {
   searchForm!: NgForm;
   isFound: boolean = true;
 
-  constructor(private router: Router, private apiService: ApiService, public tickerService: TickerService, private elementRef: ElementRef) { }
+  constructor(private router: Router, private apiService: ApiService, public tickerService: TickerService, private elementRef: ElementRef, private dataStorer: DataStorerService) { }
 
   ngOnInit(): void {
     this.ticker = this.tickerService.ticker || undefined;;
@@ -120,8 +121,9 @@ export class SearchBarComponent implements OnInit {
     event.returnValue = false;
     if (this.ticker) {
       console.log("HELLO2")
-      this.tickerService.ticker = this.ticker; // Set the ticker property
       this.tickerService.setTicker(this.ticker); // Call setTicker() method
+      this.dataStorer.setLastSearchArg(this.ticker);
+      this.dataStorer.getLastSearchArg();
     }
     this.router.navigate(['/search', this.ticker]);
   }
