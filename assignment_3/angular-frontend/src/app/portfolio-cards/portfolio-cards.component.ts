@@ -9,6 +9,7 @@ import { NgIf } from '@angular/common';
 import { ApiService } from '../api.service';
 import { DataStorerService } from '../data-storer.service';
 
+
 @Component({
   selector: 'app-portfolio-cards',
   standalone: true,
@@ -38,13 +39,14 @@ export class PortfolioCardsComponent {
     public stockModal: MatDialogRef<PortfolioCardsComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private apiCall: ApiService,
-    private dataStorer: DataStorerService
-  ) { 
+  ) {
     console.log(data);
     this.stockTicker = data.tickerSymbol;
     this.isBuying = data.purchase;
     this.currentPrice = data.marketPrice;
-    this.currentMoney = this.dataStorer.getCurrentMoney();
+    this.apiCall.getMoneyDetails().subscribe((result:any) => {
+      this.currentMoney = result[0].money;
+    });
     this.holdingQuantity = data.ownedQuantity;
     this.stockName = data.stockName;
   }
@@ -55,32 +57,33 @@ export class PortfolioCardsComponent {
     this.moneyNotEnough = this.currentMoney < this.totalCost;
     this.stockNotEnough = this.tradeQuantity > this.holdingQuantity;
   }
-  
+
   onCloseClick(): void {
     this.stockModal.close();
   }
 
   onTradeClick(): void {
-    if(this.isBuying) {
+    if (this.isBuying) {
       console.log("Buying " + this.tradeQuantity + " of " + this.stockTicker + " at " + this.currentPrice + " per share");
       this.apiCall.updateHoldings(this.stockTicker, this.tradeQuantity, this.currentPrice * this.tradeQuantity)
-      .subscribe({
-        next: (result) => {
-          console.log("Buy operation successful", result);
-          this.dataStorer.setCurrentMoney(this.currentMoney - this.currentPrice * this.tradeQuantity);
-          this.stockModal.close({ action: 'bought', success: true });
-        },
-        error: (error) => {
-          console.error("Buy operation failed", error);
-        }
-      });
+        .subscribe({
+          next: (result) => {
+            console.log("Buy operation successful", result);
+            const currVal = this.currentMoney - this.currentPrice * this.tradeQuantity;
+            this.updateMoney(currVal);
+            this.stockModal.close({ action: 'bought', success: true });
+          },
+          error: (error) => {
+            console.error("Buy operation failed", error);
+          }
+        });
     } else {
       console.log("Selling " + this.tradeQuantity + " of " + this.stockTicker);
       this.apiCall.updateHoldings(this.stockTicker, -this.tradeQuantity, this.currentPrice * this.tradeQuantity * -1)
         .subscribe({
           next: (result) => {
             console.log("Sell operation successful", result);
-            this.dataStorer.setCurrentMoney(this.currentMoney + this.currentPrice * this.tradeQuantity);
+            this.updateMoney(this.currentMoney + this.currentPrice * this.tradeQuantity);
             this.stockModal.close({ action: 'sold', success: true });
           },
           error: (error) => {
@@ -89,6 +92,20 @@ export class PortfolioCardsComponent {
         });
     }
 
+  }
+
+  updateMoney(money: number) {
+    this.apiCall.setMoneyDetails(money)
+      .subscribe(
+        response => {
+          console.log('Money updated successfully:', response);
+          // You can perform any additional actions here upon successful update
+        },
+        error => {
+          console.error('Error updating money:', error);
+          // Handle error appropriately
+        }
+      );
   }
 
 }

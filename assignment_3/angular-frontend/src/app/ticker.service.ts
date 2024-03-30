@@ -32,6 +32,7 @@ interface InsiderData {
 })
 export class TickerService {
   ticker: string | null = null;
+  prevTicker: string | null = null;
   companyName: any = null;
   companyLogo: any = null;
   exchangeCode: any = null;
@@ -87,8 +88,13 @@ export class TickerService {
     console.log('Ticker set:', ticker);
   }
 
+  setPrevTicker(ticker: string) {
+    this.prevTicker = ticker; // Set the previous ticker property
+  }
+
   clearTicker() {
     this.ticker = ''; // Clear the ticker property
+    this.prevTicker = ''; // Clear the previous ticker property
     this.tickerSubject.next(''); // Update the ticker subject
   }
 

@@ -24,3 +24,7 @@
     color: black;
     border: 1px solid red;
 }
+
+.hide-autocomplete {
+    display: none !important;
+}

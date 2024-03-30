@@ -94,4 +94,18 @@ export class ApiService {
       );
   }
 
+  getMoneyDetails() {
+    return this.httpClient.get(this.apiUrl + '/money')
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  setMoneyDetails(money: number) {
+    return this.httpClient.post(this.apiUrl + '/update-money', { money: money })
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
 }

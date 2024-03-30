@@ -75,7 +75,11 @@ export class PortfolioComponent {
       setTimeout(() => this.tradeStockMessage = '', 5000);
     });
     this.fetchHoldings();
-    this.currentMoney = this.dataStorer.getCurrentMoney();
+    this.apiService.getMoneyDetails().subscribe((result:any) => {
+      this.currentMoney = result[0].money;
+    });
+    console.log("Current Money: " + this.currentMoney);
+    // this.currentMoney = this.dataStorer.getCurrentMoney();
     this.subscription = this.showPortfolioCard.searchResult$.subscribe(result => {
       this.searchResult = result;
     });
@@ -174,7 +178,9 @@ export class PortfolioComponent {
       this.holdings = [];
       this.holdingQuote = [];
       this.fetchHoldings();
-      this.currentMoney = this.dataStorer.getCurrentMoney();
+      this.apiService.getMoneyDetails().subscribe((result:any) => {
+        this.currentMoney = result[0].money;
+      });
 
       if (result && result.success) {
         if (result.action === 'bought') {

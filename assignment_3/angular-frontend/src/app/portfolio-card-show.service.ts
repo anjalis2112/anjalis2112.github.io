@@ -71,7 +71,9 @@ private updateFinancialData(): void {
 
 private calculateCurrentMoney(): void {
   // Logic to update current money
-  this.currentMoney = this.dataStorer.getCurrentMoney();
+  this.apiService.getMoneyDetails().subscribe((result:any) => {
+    this.currentMoney = result[0].money;
+  });
 }
 
 fetchCurrentStocks() {

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { ApiService } from '../api.service';
 import { TickerService } from '../ticker.service';
 import { CommonModule } from '@angular/common';
@@ -22,6 +22,7 @@ import { PortfolioCardsComponent } from '../portfolio-cards/portfolio-cards.comp
 import { PortfolioCardShowService } from '../portfolio-card-show.service';
 import { DataStorerService } from '../data-storer.service';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { set } from 'mongoose';
 
 indicators(Highcharts);
 vbp(Highcharts);
@@ -59,6 +60,7 @@ interface HoldingData {
     providers: [DatePipe]
 })
 export class StockDetailsComponent implements OnInit {
+    @Output() peerClicked: EventEmitter<string> = new EventEmitter<string>();
     @Input() ticker: any;
     companyName: any;
     companyLogo: any;
@@ -126,6 +128,8 @@ export class StockDetailsComponent implements OnInit {
 
     constructor(public dialog: MatDialog, private tickerService: TickerService, private apiService: ApiService, private newsOpenerModel: NgbModal, private dataStorer: DataStorerService, private portfolioShow: PortfolioCardShowService, private router: Router) {
         this.calculateCurrentMoney();
+        console.log('TickerService instance inside search deets: ', this.tickerService.ticker);
+        console.log('TickerService prev instance inside search deets: ', this.tickerService.prevTicker);
     }
 
     ngOnInit(): void {
@@ -133,11 +137,13 @@ export class StockDetailsComponent implements OnInit {
             this.tradeStockMessage = message;
             setTimeout(() => this.tradeStockMessage = '', 5000);
         });
+        console.log("INSIDE STOCK PREV TICKER", this.ticker, this.tickerService.prevTicker);
+
         console.log("IM HEREEE")
         this.isLoading = true;
         console.log(this.isLoading);
         this.tickerService.ticker$.subscribe(ticker => {
-            this.ticker = ticker;    
+            this.ticker = ticker;
             console.log("INSIDE STOCK")
             this.dataStorer.getLastSearchArg();
             this.dataStorer.setLastSearchArg(this.ticker);
@@ -149,9 +155,8 @@ export class StockDetailsComponent implements OnInit {
         if (this.timestamp) {
             this.checkMarketClose();
         }
-
-
         console.log(this.isLoading);
+
     }
 
     private setValues() {
@@ -225,7 +230,7 @@ export class StockDetailsComponent implements OnInit {
         this.trendsData = undefined;
         this.surpriseData = undefined;
     }
-    
+
 
     createHourlyChart() {
         const priceData: [number, number][] = [];
@@ -541,11 +546,14 @@ export class StockDetailsComponent implements OnInit {
         });
     }
     updateFavorites(ticker: string, name?: string) {
-        this.apiService.updateFavorites(ticker, name).subscribe(data => {
+        this.apiService.updateFavorites(ticker.toUpperCase(), name).subscribe(data => {
         });
         this.isFavorite = !this.isFavorite;
         if (this.isFavorite) {
             this.showSuccessBanner = true;
+            setTimeout(() => {
+                this.showSuccessBanner = false;
+            },4000);
         }
         else {
             this.showSuccessBanner = false;
@@ -597,18 +605,20 @@ export class StockDetailsComponent implements OnInit {
         })
     }
     private calculateCurrentMoney(): void {
-        // Logic to update current money
-        this.currentMoney = this.dataStorer.getCurrentMoney();
+        this.apiService.getMoneyDetails().subscribe((result:any) => {
+            this.currentMoney = result[0].money;
+          });
     }
     private updateFinancialData(): void {
         this.fetchCurrentStocks();
         this.calculateCurrentMoney();
     }
 
-    onPeerClick(peer: string){
+    onPeerClick(peer: string) {
         this.clearValues();
         this.isLoading = true;
         this.tickerService.setTicker(peer);
+        this.peerClicked.emit(peer);
         this.router.navigate(['/search', peer]);
-      }
+    }
 }

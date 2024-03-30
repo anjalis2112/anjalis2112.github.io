@@ -100,6 +100,9 @@ export class SearchBarComponent implements OnInit {
     this.ticker = result.displaySymbol;
     this.queryField.setValue(result.displaySymbol);
   }
+  updateInputFieldUsingPeer(peer: string) {
+    this.ticker = peer; // Update the value of the input field
+  }
 
   clearTicker() {
     this.results = null;
@@ -119,12 +122,25 @@ export class SearchBarComponent implements OnInit {
     console.log("HELLO")
     event.preventDefault();
     event.returnValue = false;
-    if (this.ticker) {
+    console.log(this.ticker, this.tickerService.prevTicker);
+    if (this.ticker && this.ticker !== this.tickerService.prevTicker) {
       console.log("HELLO2")
       this.tickerService.setTicker(this.ticker); // Call setTicker() method
       this.dataStorer.setLastSearchArg(this.ticker);
       this.dataStorer.getLastSearchArg();
+      this.router.navigate(['/search', this.ticker]);
     }
-    this.router.navigate(['/search', this.ticker]);
+    else {
+      console.log("HELLO3")
+      this.router.navigate(['/search']);
+    }
+    
   }
+
+  onEnter(event: Event) {
+    this.autoLoading = false; // Hide autocomplete dropdown
+    if (event instanceof KeyboardEvent) {
+        this.searchStockData(event); // Perform search
+    }
+}
 }

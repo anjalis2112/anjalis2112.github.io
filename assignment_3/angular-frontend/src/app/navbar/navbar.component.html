@@ -8,10 +8,10 @@
                     <a class="nav-link" [class.active]="isActive('/search')" (click)="checkSearchTicker()">Search</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" [class.active]="isActive('/watchlist')" href="/watchlist">Watchlist</a>
+                    <a class="nav-link" [class.active]="isActive('/watchlist')" [routerLink]="['/watchlist']">Watchlist</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" [class.active]="isActive('/portfolio')" href="/portfolio">Portfolio</a>
+                    <a class="nav-link" [class.active]="isActive('/portfolio')" [routerLink]="['/portfolio']">Portfolio</a>
                 </li>
             </ul>
         </div>

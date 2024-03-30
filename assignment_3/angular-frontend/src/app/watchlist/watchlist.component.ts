@@ -29,8 +29,10 @@ export class WatchlistComponent {
   constructor(
     private router: Router,
     private apiService: ApiService,
-    private tickerService: TickerService
-    ) {}
+    public tickerService: TickerService
+    ) {
+      console.log('TickerService instance inside watchlist: ', this.tickerService.ticker);
+    }
 
   ngOnInit() {
     this.fetchFavorites();

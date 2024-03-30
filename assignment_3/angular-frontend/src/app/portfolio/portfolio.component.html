@@ -73,8 +73,9 @@
             </div>
           </div>
           <div class="card-footer bg-light">
-            <button (click)="stockModal(true, stock.ticker,stockData[i].name,holdingQuote[i].c,stock.quantity,currentMoney)" class="btn btn-success">Buy</button>
-            <button (click)="stockModal(false, stock.ticker,stockData[i].name,holdingQuote[i].c,stock.quantity,currentMoney)" class="btn btn-danger">Sell</button>          </div>
+            <button (click)="stockModal(true, stock.ticker,stockData[i].name,holdingQuote[i].c,stock.quantity,currentMoney)" class="btn btn-primary">Buy</button>
+            <button (click)="stockModal(false, stock.ticker, stockData[i].name, holdingQuote[i].c, stock.quantity, currentMoney)" class="btn btn-danger">Sell</button>
+          </div>
         </div>
       </div>
     </div>

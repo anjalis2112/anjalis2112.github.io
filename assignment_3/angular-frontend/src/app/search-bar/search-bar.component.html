@@ -10,8 +10,8 @@
                 <div class="input-group">
                     <input type="text" class="form-control form-control-sm border-0 no-outline ml-5 mt-1"
                         [(ngModel)]="this.ticker" [matAutocomplete]="auto" [formControl]="queryField"
-                        placeholder="Enter stock ticker symbol">
-                    <mat-autocomplete #auto="matAutocomplete">
+                        placeholder="Enter stock ticker symbol" (keydown.enter)="onEnter($event)">
+                    <mat-autocomplete #auto="matAutocomplete" [class.hide-autocomplete]="autoLoading">
                         <mat-option *ngIf="isLoading">
                             <mat-spinner diameter="30"></mat-spinner>
                         </mat-option>
@@ -43,7 +43,8 @@
     </div>
 </form>
 <div *ngIf="(tickerService.ticker !== null && tickerService.ticker !== '')">
-    <app-stock-details [ticker]="tickerService.ticker"></app-stock-details>
+    <app-stock-details [ticker]="tickerService.ticker"
+        (peerClicked)="updateInputFieldUsingPeer($event)"></app-stock-details>
 </div>
 <div *ngIf="!isFound" class="container text-center mt-5">
     <div class="alert alert-danger" role="alert">

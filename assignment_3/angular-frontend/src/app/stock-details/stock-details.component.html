@@ -117,8 +117,9 @@
                                                 <p><strong>Webpage:</strong> <a [href]="webpage" target="_blank">{{
                                                         webpage }}</a></p>
                                                 <p><strong>Company Peers:</strong></p>
-                                                <span *ngFor="let peer of companyPeers">
-                                                    <a (click)="onPeerClick(peer)" class="peer-link">{{peer}}</a>,
+                                                <span *ngFor="let peer of companyPeers; let last = last">
+                                                    <a (click)="onPeerClick(peer)" class="peer-link">{{peer}}</a>
+                                                    <ng-container *ngIf="!last">,</ng-container>
                                                 </span>
                                             </div>
                                         </div>
@@ -162,10 +163,10 @@
 
                         <mat-tab label="Charts">
                             <div class="mt-5 mb-5">
-                            <highcharts-chart [Highcharts]="chartTab" [options]="chartTabOptions"
-                                [constructorType]="chartTabConstructor"
-                                style="width: 100%; height: 100%; display:block">
-                            </highcharts-chart>
+                                <highcharts-chart [Highcharts]="chartTab" [options]="chartTabOptions"
+                                    [constructorType]="chartTabConstructor"
+                                    style="width: 100%; height: 100%; display:block">
+                                </highcharts-chart>
                             </div>
                         </mat-tab>
 

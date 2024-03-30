@@ -230,10 +230,14 @@ const holdingSchema = new mongoose.Schema({
   quantity: Number,
   cost: Number, // total cost
 });
+const moneySchema = new mongoose.Schema({
+  money: Number,
+});
 
 // Create model from schema
 const Favorite = mongoose.model('Favorite', favoriteSchema, 'favorites'); // 3rd argument specifies the collection name
 const Holding = mongoose.model('Holding', holdingSchema, 'holdings');
+const MoneyDetails = mongoose.model('Money', moneySchema, 'money');
 
 // get favorites
 app.get('/favorites', async (req, res) => {
@@ -318,4 +322,33 @@ app.post('/holdings', async (req, res) => {
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
+});
+
+app.get('/money', (req, res) => {
+  MoneyDetails.find()
+    .then((result) => {
+      res.status(200).json(result);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json(err);
+    });
+});
+
+app.post('/update-money', (req, res) => {
+  MoneyDetails.deleteOne({})
+    .then(() => {
+      const money = new MoneyDetails(req.body);
+
+      money.save()
+        .then((result) => {
+          console.log(result);
+          res.status(200).json(result);
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(500).json(err);
+        });
+    })
+
 });
