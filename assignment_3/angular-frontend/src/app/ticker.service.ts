@@ -97,6 +97,10 @@ export class TickerService {
     this.newsSubject.next(news);
   }
 
+  private filterPeers(peers: string[]): string[] {
+    return peers.filter(peer => !peer.includes('.'));
+  }
+
   fetchData(): Observable<any> {
     if (!this.ticker) {
       return throwError("Ticker is not set");
@@ -186,7 +190,7 @@ export class TickerService {
         this.surpriseData = earningsData;
 
         // Update peers data
-        this.companyPeers = peersData;
+        this.companyPeers = this.filterPeers(peersData);
 
         // Update historical data
         this.historicalData = historicalData;

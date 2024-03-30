@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ApiService } from '../api.service';
 import { TickerService } from '../ticker.service';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DatePipe } from '@angular/common';
@@ -124,7 +124,7 @@ export class StockDetailsComponent implements OnInit {
     currentMoney = 0;
     isHolding: boolean = false;
 
-    constructor(public dialog: MatDialog, private tickerService: TickerService, private apiService: ApiService, private newsOpenerModel: NgbModal, private dataStorer: DataStorerService, private portfolioShow: PortfolioCardShowService) {
+    constructor(public dialog: MatDialog, private tickerService: TickerService, private apiService: ApiService, private newsOpenerModel: NgbModal, private dataStorer: DataStorerService, private portfolioShow: PortfolioCardShowService, private router: Router) {
         this.calculateCurrentMoney();
     }
 
@@ -195,6 +195,37 @@ export class StockDetailsComponent implements OnInit {
         }, 30);
 
     }
+
+    private clearValues() {
+        this.companyName = undefined;
+        this.companyLogo = undefined;
+        this.exchangeCode = undefined;
+        this.lastPrice = undefined;
+        this.change = undefined;
+        this.changePercent = undefined;
+        this.timestamp = undefined;
+        this.highPrice = undefined;
+        this.lowPrice = undefined;
+        this.openPrice = undefined;
+        this.prevClosePrice = undefined;
+        this.ipoStartDate = undefined;
+        this.industry = undefined;
+        this.webpage = undefined;
+        this.companyPeers = undefined;
+        this.news = undefined;
+        this.totalMSPR = undefined;
+        this.positiveMSPR = undefined;
+        this.negativeMSPR = undefined;
+        this.totalChange = undefined;
+        this.positiveChange = undefined;
+        this.negativeChange = undefined;
+        this.hourlyData = undefined;
+        this.hourlyOptions = undefined;
+        this.historicalData = undefined;
+        this.trendsData = undefined;
+        this.surpriseData = undefined;
+    }
+    
 
     createHourlyChart() {
         const priceData: [number, number][] = [];
@@ -573,4 +604,11 @@ export class StockDetailsComponent implements OnInit {
         this.fetchCurrentStocks();
         this.calculateCurrentMoney();
     }
+
+    onPeerClick(peer: string){
+        this.clearValues();
+        this.isLoading = true;
+        this.tickerService.setTicker(peer);
+        this.router.navigate(['/search', peer]);
+      }
 }

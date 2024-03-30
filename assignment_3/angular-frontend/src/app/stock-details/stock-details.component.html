@@ -117,7 +117,9 @@
                                                 <p><strong>Webpage:</strong> <a [href]="webpage" target="_blank">{{
                                                         webpage }}</a></p>
                                                 <p><strong>Company Peers:</strong></p>
-                                                <p>{{ companyPeers }}</p>
+                                                <span *ngFor="let peer of companyPeers">
+                                                    <a (click)="onPeerClick(peer)" class="peer-link">{{peer}}</a>,
+                                                </span>
                                             </div>
                                         </div>
                                     </div>

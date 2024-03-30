@@ -9,7 +9,7 @@
             <div class="rounded-pill border border-2" style="--mdb-border-color: #1d279d;">
                 <div class="input-group">
                     <input type="text" class="form-control form-control-sm border-0 no-outline ml-5 mt-1"
-                        [(ngModel)]="ticker" [matAutocomplete]="auto" [formControl]="queryField"
+                        [(ngModel)]="this.ticker" [matAutocomplete]="auto" [formControl]="queryField"
                         placeholder="Enter stock ticker symbol">
                     <mat-autocomplete #auto="matAutocomplete">
                         <mat-option *ngIf="isLoading">
