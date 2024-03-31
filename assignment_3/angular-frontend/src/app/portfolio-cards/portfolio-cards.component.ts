@@ -41,7 +41,7 @@ export class PortfolioCardsComponent {
     private apiCall: ApiService,
   ) {
     console.log(data);
-    this.stockTicker = data.tickerSymbol;
+    this.stockTicker = data.tickerSymbol.toUpperCase();
     this.isBuying = data.purchase;
     this.currentPrice = data.marketPrice;
     this.apiCall.getMoneyDetails().subscribe((result:any) => {

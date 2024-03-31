@@ -1,8 +1,8 @@
 <div class="container-fluid mt-4">
     <div class="row justify-content-center">
       <div class="col-12 col-md-8 col-lg-8">
-          <h1 class="watchlist-header">My Portfolio</h1>
-          <p class="text-secondary">Money in Wallet: ${{currentMoney  | number:'1.2-2'}}</p>
+          <h1 class="watchlist-header">My Investment Summary</h1>
+          <p style="font-size: 20px; color: black; ">Funds Available: ${{currentMoney  | number:'1.2-2'}}</p>
       </div>
   </div>
     <div class="d-flex justify-content-center" *ngIf="isLoading">
@@ -10,17 +10,17 @@
     </div>
     <div class="row justify-content-center" *ngIf="!isLoading"> <!-- Ensure each card is a row of its own -->
       <div *ngIf="tradeStockMessage">
-        <div  [ngClass]="{'alert-success': alertTypeBuy === 'buy', 'alert-danger': alertTypeBuy === 'sell'}" class="alert">
+        <div  [ngClass]="{'alert-success': alertTypeBuy === 'buy', 'alert-danger': alertTypeBuy === 'sell'}" class="alert custom-alert mb-3">
             {{ tradeStockMessage }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>  
         </div>
       <div class="col-12 col-md-8 col-lg-8 mb-4" *ngFor="let stock of holdings; let i=index;"> <!-- Full width card and margin bottom -->
         <div class="card">
-          <div class="card-header bg-light text-black">
+          <div class="card-header text-black" style="background-color: rgb(229, 226, 226);border: 1px solid darkgray;">
             <span style="font-size: 20px;">{{ stock.ticker }} </span>{{ stockData[i].name }}
           </div>
-          <div class="card-body">
+          <div class="card-body" style="border-right: 1px solid darkgray;border-left: 1px solid darkgray;">
             <div class="row">
               <div class="col-12 col-md-6"> 
                 <p><span class="key" style="display: inline-block; min-width: 200px;">Quantity:</span><span class="value"><strong>{{ stock.quantity }}</strong></span></p>
@@ -72,20 +72,20 @@
               </div>
             </div>
           </div>
-          <div class="card-footer bg-light">
-            <button (click)="stockModal(true, stock.ticker,stockData[i].name,holdingQuote[i].c,stock.quantity,currentMoney)" class="btn btn-primary">Buy</button>
-            <button (click)="stockModal(false, stock.ticker, stockData[i].name, holdingQuote[i].c, stock.quantity, currentMoney)" class="btn btn-danger">Sell</button>
-          </div>
+          <div class="card-footer" style="background-color: rgb(238, 238, 238);border: 1px solid darkgray;">
+            <button (click)="stockModal(true, stock.ticker, stockData[i].name, holdingQuote[i].c, stock.quantity, currentMoney)" class="btn btn-primary btn-no-caps" style="margin-right: 10px;">Buy</button>
+            <button (click)="stockModal(false, stock.ticker, stockData[i].name, holdingQuote[i].c, stock.quantity, currentMoney)" class="btn btn-danger btn-no-caps">Sell</button>
+        </div>
+        
         </div>
       </div>
     </div>
     <div *ngIf="holdings.length == 0">
       <div class="row justify-content-center">
         <div class="alert alert-warning text-dark text-center col-sm-10 col-md-8 col-lg-6" role="alert">
-            Currently you don't have any stock.
+            Currently you don't have any holdings.
         </div>
     </div>
-      <!-- <p class="text-center no-holding p-2">Currently you don't have any stock.</p> -->
+
   </div>
   </div>
-  

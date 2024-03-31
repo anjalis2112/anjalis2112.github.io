@@ -15,7 +15,7 @@
                                     <div class="col">
                                         <div class="row mb-1 ml-5 mt-0 pl-2">
                                             <button class="btn-sm no-border d-flex align-items-center p-0"
-                                                (click)="removeFromFavorites(stock.ticker)">
+                                                (click)="removeFromFavorites(stock.ticker); $event.stopPropagation();">
                                                 <i class="fa fa-times fa-sm" aria-hidden="true"
                                                     style="color: darkgray; font-size: 12px;"></i>
                                             </button>
@@ -36,14 +36,14 @@
                                             <div *ngIf="quoteDetails[i].d > 0" class="d-flex align-items-center">
                                                 <i class="fa fa-caret-up text-success mt-0 mr-2"
                                                     style="font-size: 20px; margin-right: 5px;"></i>
-                                                <h3 class="mb-0 ml-5 text-success"> {{quoteDetails[i].d}}
-                                                    ({{quoteDetails[i].dp}}%)</h3>
+                                                <h5 class="mb-0 ml-5 text-success"> {{quoteDetails[i].d.toFixed(2)}}
+                                                    ({{quoteDetails[i].dp.toFixed(2)}}%)</h5>
                                             </div>
                                             <div *ngIf="quoteDetails[i].d <= 0" class="d-flex align-items-center">
                                                 <i class="fa fa-caret-down text-danger mt-0"
                                                     style="font-size: 20px; margin-right: 5px;"></i>
-                                                <h3 class="mb-0 ml-5 text-danger">{{quoteDetails[i].d}}
-                                                    ({{quoteDetails[i].dp}}%)</h3>
+                                                <h5 class="mb-0 ml-5 text-danger">{{quoteDetails[i].d.toFixed(2)}}
+                                                    ({{quoteDetails[i].dp.toFixed(2)}}%)</h5>
                                             </div>
                                         </div>
                                     </div>
@@ -58,7 +58,7 @@
                     <div class="col p-0">
                         <div class="alert alert-warning text-center" role="alert"
                             style="border: 1px solid #c79b00; color: black;">
-                            Currently you don't have any stock.
+                            Currently you dont have any stock.
                         </div>
                     </div>
                 </div>

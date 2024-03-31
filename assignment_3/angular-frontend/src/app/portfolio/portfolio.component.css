@@ -1,0 +1,17 @@
+.btn-no-caps {
+    text-transform: none;
+}
+
+.custom-alert {
+    max-width: 400px; /* Adjust the width as needed */
+    margin: auto; /* Center align */
+    position: relative;
+  }
+  
+  .custom-alert .btn-close {
+    position: absolute;
+    top: 50%;
+    right: 5px; /* Adjust the margin as needed */
+    transform: translateY(-50%);
+  }
+  

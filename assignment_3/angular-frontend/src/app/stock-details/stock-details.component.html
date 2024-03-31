@@ -4,7 +4,7 @@
             <div class="col-md-12 d-flex justify-content-center mt-5" *ngIf="isLoading">
                 <mat-spinner diameter="50"></mat-spinner>
             </div>
-            <div class="container mt-4" *ngIf="ticker && companyName">
+            <div class="container mt-4" *ngIf="ticker && companyName && !isLoading">
                 <div class="alert alert-success d-flex align-items-center justify-content-between"
                     *ngIf="showSuccessBanner" style="border: 1px solid darkgreen; padding: 0.70rem 1rem;">
                     <div class="col-md-12 d-flex justify-content-center">
@@ -20,14 +20,14 @@
                 </div>
                 <div *ngIf="tradeStockMessage">
                     <div [ngClass]="{'alert-success': alertTypeBuy === 'buy', 'alert-danger': alertTypeBuy === 'sell'}"
-                        class="alert">
+                        class="alert custom-alert mb-3">
                         {{ tradeStockMessage }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 </div>
-                <div class="row">
+                <div class="d-flex flex-wrap">
                     <!-- Left Side Column -->
-                    <div class="col-md-4" *ngIf="ticker && companyName"> <!-- Adjust margin-bottom as needed -->
+                    <div class="col-4 col-md-4" *ngIf="ticker && companyName"> <!-- Adjust margin-bottom as needed -->
                         <div class="text-center">
                             <h1 style="margin-bottom: 0px;font-size: 30px;">
                                 {{ ticker.toUpperCase() }}
@@ -42,32 +42,39 @@
                             </h1>
                             <h2 style="margin-bottom: 3px;">{{ companyName }}</h2>
                             <p class="small" style="margin-bottom: 5px;">{{ exchangeCode }}</p>
-                            <div class="mt-2">
-                                <button (click)="portfolioDisplay(true)"
-                                    class="btn btn-success shadow-none btn-no-caps "
-                                    style="margin-right:3px;">Buy</button>
-                                <button (click)="portfolioDisplay(false)" *ngIf="isHolding"
-                                    class="btn btn-danger shadow-none btn-no-caps">Sell</button>
+                            <div class="mt-2 d-flex flex-wrap justify-content-center flex-sm-row">
+                                <div class="mt-2 d-flex flex-wrap justify-content-center flex-sm-row">
+                                    <div class="col-6 d-flex justify-content-end" *ngIf="isHolding">
+                                        <button (click)="portfolioDisplay(true)"
+                                            class="btn btn-success shadow-none btn-no-caps"
+                                            style="margin-right:3px;">Buy</button>
+                                    </div>
+                                    <div class="col-6 d-flex justify-content-start">
+                                        <button (click)="portfolioDisplay(false)" *ngIf="isHolding"
+                                            class="btn btn-danger shadow-none btn-no-caps">Sell</button>
+                                    </div>
+                                </div>
+                                <div *ngIf="!isHolding">
+                                    <div class="col-12 d-flex justify-content-center">
+                                        <button (click)="portfolioDisplay(true)"
+                                            class="btn btn-success shadow-none btn-no-caps">Buy</button>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
 
                     <!-- Middle Column -->
-                    <div class="col-md-4">
+                    <div class="col-4 col-md-4"> <!-- Adjust column sizes for different screen sizes -->
                         <div class="text-center">
-                            <img [src]="companyLogo" alt="Company Logo" class="img-fluid" style="max-height: 100px;">
-                            <div class="mt-md-5 text-danger" *ngIf="marketClosed">
-                                <!-- Adjusted margin for medium and larger devices -->
-                                Market Closed on {{ timestamp | date: 'yyyy-MM-dd HH:mm:ss' }}
-                            </div>
-                            <div class="mt-md-5 text-success" *ngIf="!marketClosed">
-                                <!-- Adjusted margin for medium and larger devices -->
-                                Market is Open
-                            </div>
+                            <img [src]="companyLogo" alt="Company Logo"
+                                class="img-fluid company-logo-img max-width-img">
+                            <!-- <img [src]="companyLogo" alt="Company Logo" class="img-fluid" style="max-height: 100px;"> -->
                         </div>
                     </div>
                     <!-- Right Side Column -->
-                    <div class="col-md-4">
+                    <div class="col-4 col-md-4">
                         <div class="text-center">
                             <div class="d-flex justify-content-center align-items-center">
                                 <h1 [ngClass]="{'text-success': change >= 0, 'text-danger': change < 0}"
@@ -92,7 +99,16 @@
                     </div>
                 </div>
 
-
+                <div class="text-center mt-2">
+                    <div class="mt-md-5 text-danger" *ngIf="marketClosed">
+                        <!-- Adjusted margin for medium and larger devices -->
+                        Market Closed on {{ timestamp | date: 'yyyy-MM-dd HH:mm:ss' }}
+                    </div>
+                    <div class="mt-md-5 text-success" *ngIf="!marketClosed">
+                        <!-- Adjusted margin for medium and larger devices -->
+                        Market is Open
+                    </div>
+                </div>
 
                 <div class="row mt-4">
                     <!-- Summary View -->
@@ -101,15 +117,16 @@
                             <div class="container-fluid"> <!-- Ensuring the container spans the entire width -->
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <div class="ml-3"> <!-- Add left margin -->
-                                            <div class="price-info col-6 text-center mt-4">
-                                                <h3><strong>High Price:</strong> {{ highPrice }}</h3>
-                                                <h3><strong>Low Price:</strong> {{ lowPrice }}</h3>
-                                                <h3><strong>Open Price:</strong> {{ openPrice }}</h3>
-                                                <h3><strong>Prev. Close:</strong> {{ prevClosePrice }}</h3>
+                                        <div class="ml-md-3"> <!-- Add left margin on medium and larger screens -->
+                                            <div class="price-info col-lg-6 col-md-12 col-sm-12 text-center mt-4">
+                                                <h3><strong>High Price:</strong> {{ highPrice.toFixed(2) }}</h3>
+                                                <h3><strong>Low Price:</strong> {{ lowPrice.toFixed(2) }}</h3>
+                                                <h3><strong>Open Price:</strong> {{ openPrice.toFixed(2) }}</h3>
+                                                <h3><strong>Prev. Close:</strong> {{ prevClosePrice.toFixed(2) }}</h3>
                                             </div>
                                         </div>
-                                        <div class="col-12 text-center mt-3 mb-5"> <!-- Add bigger left margin -->
+                                        <div class="col-12 text-center mt-3 mb-5 ml-md-0">
+                                            <!-- Add bigger left margin on medium and larger screens -->
                                             <div class="company-deets">
                                                 <h3><strong><u>About the Company:</u></strong></h3>
                                                 <p><strong>IPO Start Date:</strong> {{ ipoStartDate }}</p>
@@ -118,12 +135,13 @@
                                                         webpage }}</a></p>
                                                 <p><strong>Company Peers:</strong></p>
                                                 <span *ngFor="let peer of companyPeers; let last = last">
-                                                    <a (click)="onPeerClick(peer)" class="peer-link">{{peer}}</a>
+                                                    <a (click)="onPeerClick(peer)" class="peer-link">{{ peer }}</a>
                                                     <ng-container *ngIf="!last">,</ng-container>
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
+
                                     <div class="col-md-6">
                                         <div class="mt-2">
                                             <highcharts-chart [Highcharts]="hourlyCharts" [options]="hourlyOptions"
@@ -144,14 +162,14 @@
                                         <div class="custom-card">
                                             <div class="row align-items-center">
                                                 <div class="col-md-4 order-md-1"> <!-- Image Column -->
-                                                    <div class="card-img-container">
+                                                    <div class="card-img-container col-sm-12 col-md-12">
                                                         <img [src]="item.image" alt="News Image" class="card-img">
                                                     </div>
                                                 </div>
                                                 <div class="col-md-8 order-md-2"> <!-- Title Column -->
                                                     <div class="card-body text-center text-md-start">
                                                         <!-- Center align text, start align on medium devices and above -->
-                                                        <h5 class="card-title">{{ item.title }}</h5>
+                                                        <h5 class="card-title text-center">{{ item.title }}</h5>
                                                     </div>
                                                 </div>
                                             </div>
@@ -184,17 +202,17 @@
                                         </tr>
                                         <tr>
                                             <th>Total</th>
-                                            <td>{{totalMSPR}}</td>
+                                            <td>{{totalMSPR.toFixed(2)}}</td>
                                             <td>{{totalChange}}</td>
                                         </tr>
                                         <tr>
                                             <th>Positive</th>
-                                            <td>{{positiveMSPR}}</td>
+                                            <td>{{positiveMSPR.toFixed(2)}}</td>
                                             <td>{{positiveChange}}</td>
                                         </tr>
                                         <tr>
                                             <th>Negative</th>
-                                            <td>{{negativeMSPR}}</td>
+                                            <td>{{negativeMSPR.toFixed(2)}}</td>
                                             <td>{{negativeChange}}</td>
                                         </tr>
                                     </table>

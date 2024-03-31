@@ -17,12 +17,14 @@ import { MdbTabsModule } from 'mdb-angular-ui-kit/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NewsCardComponent } from '../newscard/newscard.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { PortfolioCardsComponent } from '../portfolio-cards/portfolio-cards.component';
 import { PortfolioCardShowService } from '../portfolio-card-show.service';
 import { DataStorerService } from '../data-storer.service';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { set } from 'mongoose';
+import { Observable, interval } from 'rxjs';
+import { startWith } from 'rxjs/operators';
+
 
 indicators(Highcharts);
 vbp(Highcharts);
@@ -126,6 +128,9 @@ export class StockDetailsComponent implements OnInit {
     currentMoney = 0;
     isHolding: boolean = false;
 
+    updateSubscription!: Subscription;
+    isFound: boolean = true;
+
     constructor(public dialog: MatDialog, private tickerService: TickerService, private apiService: ApiService, private newsOpenerModel: NgbModal, private dataStorer: DataStorerService, private portfolioShow: PortfolioCardShowService, private router: Router) {
         this.calculateCurrentMoney();
         console.log('TickerService instance inside search deets: ', this.tickerService.ticker);
@@ -133,16 +138,19 @@ export class StockDetailsComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this.subscribeToUpdateSignal();
         this.tradeStockAlert.subscribe(message => {
             this.tradeStockMessage = message;
             setTimeout(() => this.tradeStockMessage = '', 5000);
         });
-        console.log("INSIDE STOCK PREV TICKER", this.ticker, this.tickerService.prevTicker);
-
-        console.log("IM HEREEE")
         this.isLoading = true;
+        console.log("INSIDE STOCK PREV TICKER", this.ticker, this.tickerService.prevTicker);
+        this.clearValues();
+        console.log("IM HEREEE")
+        
         console.log(this.isLoading);
         this.tickerService.ticker$.subscribe(ticker => {
+            this.isLoading = true;
             this.ticker = ticker;
             console.log("INSIDE STOCK")
             this.dataStorer.getLastSearchArg();
@@ -150,6 +158,10 @@ export class StockDetailsComponent implements OnInit {
             this.dataStorer.getLastSearchArg();
             this.tickerService.fetchData().subscribe(() => {
                 this.setValues();
+                if(!this.companyName)
+                {
+                    this.isLoading = false;
+                }
             });
         });
         if (this.timestamp) {
@@ -195,13 +207,12 @@ export class StockDetailsComponent implements OnInit {
         this.createSurpriseChart();
         this.checkFavoriteStatus();
         this.fetchCurrentStocks();
-        setTimeout(() => {
-            this.isLoading = false;
-        }, 30);
-
+        this.isLoading = false;
     }
 
     private clearValues() {
+        this.isLoading = true;
+        console.log("CLEARING VALUES: ", this.isLoading);
         this.companyName = undefined;
         this.companyLogo = undefined;
         this.exchangeCode = undefined;
@@ -542,7 +553,7 @@ export class StockDetailsComponent implements OnInit {
     checkFavoriteStatus() {
         this.apiService.getFavorites().subscribe(favorites => {
             const favoritesArray = favorites as FavoriteData[];
-            this.isFavorite = favoritesArray.some(favorite => favorite.ticker === this.ticker);
+            this.isFavorite = favoritesArray.some(favorite => favorite.ticker === this.ticker.toUpperCase());
         });
     }
     updateFavorites(ticker: string, name?: string) {
@@ -573,7 +584,7 @@ export class StockDetailsComponent implements OnInit {
         let tradeDialogRef = this.dialog.open(PortfolioCardsComponent, {
             width: '400px',
             data: {
-                tickerSymbol: this.ticker,
+                tickerSymbol: this.ticker.toUpperCase(),
                 stockName: this.companyName,
                 purchase: sell,
                 ownedQuantity: this.holdingQuantity,
@@ -588,10 +599,10 @@ export class StockDetailsComponent implements OnInit {
             this.updateFinancialData();
             if (result && result.success) {
                 if (result.action === 'bought') {
-                    this.tradeStockAlert.next(this.ticker + " bought Successfully");
+                    this.tradeStockAlert.next(this.ticker.toUpperCase() + " bought Successfully");
                     this.alertTypeBuy = 'buy'; // Set your alert type for styling if needed
                 } else if (result.action === 'sold') {
-                    this.tradeStockAlert.next(this.ticker + " sold Successfully");
+                    this.tradeStockAlert.next(this.ticker.toUpperCase() + " sold Successfully");
                     this.alertTypeBuy = 'sell'; // Set your alert type for styling if needed
                 }
             }
@@ -600,8 +611,8 @@ export class StockDetailsComponent implements OnInit {
     fetchCurrentStocks() {
         this.apiService.getHoldings().subscribe(holdings => {
             const holdingsArray = holdings as HoldingData[];
-            this.isHolding = holdingsArray.some(holding => holding.ticker === this.ticker);
-            this.holdingQuantity = holdingsArray.find(holding => holding.ticker === this.ticker)?.quantity || 0;
+            this.isHolding = holdingsArray.some(holding => holding.ticker === this.ticker.toUpperCase());
+            this.holdingQuantity = holdingsArray.find(holding => holding.ticker === this.ticker.toUpperCase())?.quantity || 0;
         })
     }
     private calculateCurrentMoney(): void {
@@ -620,5 +631,19 @@ export class StockDetailsComponent implements OnInit {
         this.tickerService.setTicker(peer);
         this.peerClicked.emit(peer);
         this.router.navigate(['/search', peer]);
+    }
+
+    subscribeToUpdateSignal() {
+        this.updateSubscription = this.getUpdateSignal().subscribe(() => {
+            if (this.ticker && !this.marketClosed) {
+                this.setValues();
+                console.log("Refreshing");
+            }
+        });
+    }
+
+    getUpdateSignal(): Observable<number> {
+        // emit value at start and every 15 seconds
+        return interval(15000).pipe(startWith(0));
     }
 }

@@ -1,0 +1,11 @@
+.close-button {
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  
+  #close-icon {
+    color: blue;
+    text-decoration: underline;
+    border: none;
+  }

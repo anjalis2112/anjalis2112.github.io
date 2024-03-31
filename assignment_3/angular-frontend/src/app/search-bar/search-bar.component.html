@@ -46,6 +46,19 @@
     <app-stock-details [ticker]="tickerService.ticker"
         (peerClicked)="updateInputFieldUsingPeer($event)"></app-stock-details>
 </div>
+<div *ngIf="isEmpty" class="container text-center mt-5">
+    <div class="alert alert-danger d-flex justify-content-between align-items-center" role="alert">
+        <div class="col-11">
+            <span class="text-center" style="margin-left: 30px;">Please enter a valid ticker.</span>
+        </div>
+        <div class="mr-2">
+            <button type="button" class="btn btn-sm btn-light" (click)="clearAlert()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 <div *ngIf="!isFound" class="container text-center mt-5">
     <div class="alert alert-danger" role="alert">
         No data found. Please enter a valid ticker.

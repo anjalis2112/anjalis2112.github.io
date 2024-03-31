@@ -14,14 +14,36 @@
     margin-top: 20px;
 }
 
-.custom-card .card-img-container {
-    padding: 10px;
+@media(min-width: 577px) { /* Adjust the min-width to target specific screen sizes */
+    .custom-card .card-img-container {
+        padding: 10px;
+    }
+    .custom-card .card-img {
+        width: 150px;
+        height: 100px;
+    }
 }
 
-.custom-card .card-img {
-    width: 150px;
-    height: 100px;
+
+@media (max-width: 576px) { /* Adjust the max-width to target specific screen sizes */
+    .custom-card.card-img-container.text-center {
+        text-align: center;
+    }
 }
+
+.custom-alert {
+    max-width: 400px; /* Adjust the width as needed */
+    margin: auto; /* Center align */
+    position: relative;
+  }
+  
+  .custom-alert .btn-close {
+    position: absolute;
+    top: 50%;
+    right: 5px; /* Adjust the margin as needed */
+    transform: translateY(-50%);
+  }
+
 
 .custom-card .card-body {
     padding: 15px;
@@ -44,6 +66,21 @@ td, th {
     width: 100%; /* Set width to 100% of viewport width */
     height: 100vh; /* Set height to 100% of viewport height */
     /* overflow: hidden; Ensure chart does not overflow its container */
+}
+@media (max-width: 576px) { 
+    .company-logo-img {
+      max-height: 50px; 
+    }
+  }
+
+  @media (min-width: 577px) { 
+    .company-logo-img {
+      max-height: 100px; 
+    }
+  }
+  .max-width-img {
+    max-width: 100%; /* Set the maximum width to 100% */
+    height: auto; /* Maintain aspect ratio */
 }
 
 

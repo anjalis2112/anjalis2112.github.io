@@ -1,10 +1,10 @@
 <div class="modal-header p-3">
     <h3 class="m-0">{{ stockTicker }}</h3>
-    <button type="button" class="close-button" aria-label="Close" (click)="onCloseClick()">
+    <button type="button btn-primary" class="close-button" style="background-color: transparent; border: none;" aria-label="Close" (click)="onCloseClick()">
         <i class="fa-solid fa-xmark fa-2xs" id="close-icon"></i>
     </button>
 </div>
-<div class="modal-body p-4">
+<div class="modal-body p-4" style="border-top: 1px solid rgb(232, 232, 232); border-bottom: 1px solid rgb(232, 232, 232);">
     Current Price: {{currentPrice}}
     <br>
     Money in Wallet: ${{ currentMoney | number:'1.2-2' }}
@@ -20,7 +20,7 @@
     <span *ngIf="moneyNotEnough && isBuying" class="text-danger text-thicker">Not enough money in wallet!</span>
     <span *ngIf="stockNotEnough && !isBuying" class="text-danger text-thicker">You cannot sell the stocks that you don't have!</span>
 </div>
-<div class="modal-footer p-2">
+<div class="modal-footer p-2" style="display: flex; justify-content: space-between;">
     <div>Total: {{ totalCost | number:'1.2-2' }}</div>
     <button type="button" class="btn btn-success" (click)="onTradeClick()" [disabled]="isBuying ? currentMoney < totalCost : tradeQuantity > holdingQuantity">
         {{ isBuying ? 'Buy' : 'Sell' }}

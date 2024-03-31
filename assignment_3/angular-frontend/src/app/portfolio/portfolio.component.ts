@@ -4,14 +4,12 @@ import { NgIf, NgFor } from '@angular/common';
 import { ApiService } from '../api.service';
 import { Subject, Subscription, forkJoin, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { DataStorerService } from '../data-storer.service';
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// import { OpenStockModalService } from '../../services/open-stock-modal.service';
 import { MatDialog } from '@angular/material/dialog';
 import { PortfolioCardShowService } from '../portfolio-card-show.service';
 import { PortfolioCardsComponent } from '../portfolio-cards/portfolio-cards.component';
 
+// Interfaces for data structures
 interface QuoteData {
   c: number;
   d: number;
@@ -62,29 +60,33 @@ export class PortfolioComponent {
 
   constructor(
     private apiService: ApiService,
-    private dataStorer: DataStorerService,
     private showPortfolioCard: PortfolioCardShowService,
     public dialog: MatDialog
   ) {
-   
+
   }
 
   ngOnInit() {
+    // Subscribe to trade stock alerts
     this.tradeStockAlert.subscribe(message => {
+      // Show trade stock message for 5 seconds
       this.tradeStockMessage = message;
       setTimeout(() => this.tradeStockMessage = '', 5000);
     });
+    // Fetch initial data
     this.fetchHoldings();
-    this.apiService.getMoneyDetails().subscribe((result:any) => {
+    // Fetch current money details
+    this.apiService.getMoneyDetails().subscribe((result: any) => {
       this.currentMoney = result[0].money;
     });
     console.log("Current Money: " + this.currentMoney);
-    // this.currentMoney = this.dataStorer.getCurrentMoney();
+    // Subscribe to search results
     this.subscription = this.showPortfolioCard.searchResult$.subscribe(result => {
       this.searchResult = result;
     });
   }
 
+  // Fetch holdings data
   fetchHoldings() {
     this.isLoading = true;
     this.apiService.getHoldings().subscribe(data => {
@@ -93,6 +95,7 @@ export class PortfolioComponent {
         this.isLoading = false;
         return;
       }
+      // Fetch stock and quotes for holdings
       this.fetchStock();
       this.fetchQuotesForHoldings();
     }, error => {
@@ -101,98 +104,110 @@ export class PortfolioComponent {
     });
   }
 
+  // Fetch stock data for holdings
   fetchStock() {
     const namesObservables = this.holdings.map(holding => {
-      // get quote for each favorite
-      return this.apiService.getProfileData(holding.ticker).pipe(
+      // Get profile data for each holding
+      return this.apiService.getProfileData(holding.ticker.toUpperCase()).pipe(
         catchError(error => {
-          console.error(`Failed to fetch name for ${holding.ticker}:`, error);
-          return of(null); // returns null if error
+          console.error(`Failed to fetch name for ${holding.ticker.toUpperCase()}:`, error);
+          return of(null); // Return null if error
         })
       );
     });
-    // wait for all quotes
+    // Wait for all profile data
     forkJoin(namesObservables).subscribe(names => {
+      // Filter out null entries
       this.stockData = names.filter(name => name !== null) as StockName[];
-      // this.isLoading = false; // Update loading state only after all quotes have been fetched
     }, error => {
       console.error('Failed to fetch quotes:', error);
       this.isLoading = false;
     });
   }
 
-  isLessThanZero(stockCost: number, stockQuantity: number, currentPrice: number): boolean {
+  // Check if cost difference is less than zero
+  isCostDiffLessThanZero(stockCost: number, stockQuantity: number, currentPrice: number): boolean {
     const result = (stockCost / stockQuantity) - currentPrice;
     return Number(result.toFixed(2)) < 0;
   }
 
-  isGreaterThanZero(stockCost: number, stockQuantity: number, currentPrice: number): boolean {
-    const result = (stockCost / stockQuantity) - currentPrice;
-    return Number(result.toFixed(2)) > 0;
-  }
-
-  isEqualToZero(stockCost: number, stockQuantity: number, currentPrice: number): boolean {
-    const result = (stockCost / stockQuantity) - currentPrice;
-    return Number(result.toFixed(2)) === 0;
-  }
-
+  // Fetch quotes for holdings
   fetchQuotesForHoldings() {
     const quotesObservables = this.holdings.map(holding => {
-      // get quote for each favorite
-      return this.apiService.getQuoteData(holding.ticker).pipe(
+      // Get quote data for each holding
+      return this.apiService.getQuoteData(holding.ticker.toUpperCase()).pipe(
         catchError(error => {
-          console.error(`Failed to fetch quote for ${holding.ticker}:`, error);
-          return of(null); // returns null if error
+          console.error(`Failed to fetch quote for ${holding.ticker.toUpperCase()}:`, error);
+          return of(null); // Return null if error
         })
       );
     });
-    // wait for all quotes
+    // Wait for all quote data
     forkJoin(quotesObservables).subscribe(quotes => {
+      // Filter out null entries
       this.holdingQuote = quotes.filter(quote => quote !== null) as QuoteData[];
       this.isLoading = false; // Update loading state only after all quotes have been fetched
     }, error => {
       console.error('Failed to fetch quotes:', error);
       this.isLoading = false;
-    });   
+    });
   }
 
-
-
+  // Open stock modal dialog
   stockModal(toBuy: boolean, ticker: string, stockName: string, currentPrice: number, quantity: number, money: number) {
-    console.log("Money: " + money + "ticker: " + ticker + "stockName: " + stockName + "currPrice: " + currentPrice + "q: " + quantity );
+    console.log("Money: " + money + "ticker: " + ticker + "stockName: " + stockName + "currPrice: " + currentPrice + "q: " + quantity);
     this.ticker = ticker;
     const dialogVar = this.dialog.open(PortfolioCardsComponent, {
       width: '400px',
-      data: { 
-        tickerSymbol: ticker,
+      data: {
+        tickerSymbol: ticker.toUpperCase(),
         stockName: stockName,
         purchase: toBuy,
         marketPrice: currentPrice,
         ownedQuantity: quantity,
         currentMoney: money
-       }
+      }
     });
 
     dialogVar.afterClosed().subscribe(result => {
+      // Clear data and fetch updated holdings
       this.stockData = [];
       this.holdings = [];
       this.holdingQuote = [];
       this.fetchHoldings();
-      this.apiService.getMoneyDetails().subscribe((result:any) => {
+      // Fetch updated money details
+      this.apiService.getMoneyDetails().subscribe((result: any) => {
         this.currentMoney = result[0].money;
       });
 
+      // Handle successful transactions
       if (result && result.success) {
+        const upper = this.ticker.toUpperCase();
+        console.log("PORTOFOLIO COMPONENT: " + upper)
         if (result.action === 'bought') {
-          this.tradeStockAlert.next(this.ticker + " bought Successfully");
+          // Emit buy success alert
+          this.tradeStockAlert.next(upper + " bought Successfully");
           this.alertTypeBuy = 'buy'; // Set your alert type for styling if needed
         } else if (result.action === 'sold') {
-          this.tradeStockAlert.next(this.ticker + " sold Successfully");
+          // Emit sell success alert
+          this.tradeStockAlert.next(upper + " sold Successfully");
           this.alertTypeBuy = 'sell'; // Set your alert type for styling if needed
         }
       }
-    
+
     });
+  }
+
+  // Check if cost difference is greater than zero
+  isCostDiffGreaterThanZero(stockCost: number, stockQuantity: number, currentPrice: number): boolean {
+    const result = (stockCost / stockQuantity) - currentPrice;
+    return Number(result.toFixed(2)) > 0;
+  }
+
+  // Check if cost difference is equal to zero
+  isCostDiffEqualToZero(stockCost: number, stockQuantity: number, currentPrice: number): boolean {
+    const result = (stockCost / stockQuantity) - currentPrice;
+    return Number(result.toFixed(2)) === 0;
   }
 
 }

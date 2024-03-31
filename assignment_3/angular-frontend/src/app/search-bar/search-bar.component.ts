@@ -38,6 +38,7 @@ export class SearchBarComponent implements OnInit {
   @ViewChild('searchForm')
   searchForm!: NgForm;
   isFound: boolean = true;
+  isEmpty: boolean = false;
 
   constructor(private router: Router, private apiService: ApiService, public tickerService: TickerService, private elementRef: ElementRef, private dataStorer: DataStorerService) { }
 
@@ -61,7 +62,7 @@ export class SearchBarComponent implements OnInit {
           console.log(this.isFound);
           this.results = data.result;
           console.log(this.results.length);
-          if(this.results.length > 0){
+          if (this.results.length > 0) {
             console.log("test isfound");
             this.isFound = true;
             console.log(this.isFound);
@@ -71,7 +72,7 @@ export class SearchBarComponent implements OnInit {
           }
         },
         () => {
-        
+
           this.results = null;
         }
       );
@@ -99,9 +100,20 @@ export class SearchBarComponent implements OnInit {
   selectResult(result: any) {
     this.ticker = result.displaySymbol;
     this.queryField.setValue(result.displaySymbol);
+    if (this.ticker)
+      this.tickerService.setTicker(this.ticker);
+    this.router.navigate(['/search', this.ticker]);
   }
   updateInputFieldUsingPeer(peer: string) {
     this.ticker = peer; // Update the value of the input field
+  }
+
+  onTickerSelected(event: any): void {
+    console.log("CHECKING AUTOCOMPLETE TICKER: ", this.ticker);
+    this.selectResult(event.displaySymbol);
+    console.log("CHECKING AUTOCOMPLETE TICKER: ", this.ticker);
+    this.searchStockData(this.ticker); // Perform search
+
   }
 
   clearTicker() {
@@ -125,6 +137,7 @@ export class SearchBarComponent implements OnInit {
     console.log(this.ticker, this.tickerService.prevTicker);
     if (this.ticker && this.ticker !== this.tickerService.prevTicker) {
       console.log("HELLO2")
+      this.isEmpty = false;
       this.tickerService.setTicker(this.ticker); // Call setTicker() method
       this.dataStorer.setLastSearchArg(this.ticker);
       this.dataStorer.getLastSearchArg();
@@ -132,15 +145,20 @@ export class SearchBarComponent implements OnInit {
     }
     else {
       console.log("HELLO3")
+      this.isEmpty = true;
       this.router.navigate(['/search']);
     }
-    
+
   }
 
   onEnter(event: Event) {
-    this.autoLoading = false; // Hide autocomplete dropdown
+    this.autoLoading = true; // Hide autocomplete dropdown
     if (event instanceof KeyboardEvent) {
-        this.searchStockData(event); // Perform search
+      this.searchStockData(event); // Perform search
     }
-}
+  }
+
+  clearAlert() {
+    this.isEmpty = false;
+  }
 }

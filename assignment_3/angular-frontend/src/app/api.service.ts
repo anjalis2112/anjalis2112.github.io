@@ -9,6 +9,7 @@ import { throwError } from 'rxjs';
 })
 export class ApiService {
 
+  // private apiUrl = '';
   private apiUrl = 'http://localhost:8080';
   readonly favorites = this.apiUrl + '/favorites/'
   readonly holdings = this.apiUrl + '/holdings/'

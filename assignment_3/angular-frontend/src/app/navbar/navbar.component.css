@@ -26,3 +26,25 @@
     border-color: white;
     color: lightgrey; 
 }
+
+.navbar-toggler {
+    margin-right: 10px;
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 5px; /* Rounded corners */
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.navbar-toggler div {
+    width: 25px;
+    height: 2px;
+    background-color: white;
+    margin: 6px 0;
+}
+
+@media (max-width: 991.98px) {
+    .custom-buttons {
+        margin-top: 10px; /* Adjust the margin between the navbar toggle button and the navigation options */
+        margin-right: 10px;
+    }
+}
